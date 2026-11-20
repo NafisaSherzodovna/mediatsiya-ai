@@ -39,13 +39,14 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
 - `requirements.txt`, pinned: `Django>=5.2,<5.3`, `djangorestframework>=3.16`, `gunicorn`, `whitenoise`,
   `httpx`, `pydantic>=2.7`, `rank-bm25`, `python-dotenv`.
 
-- [ ] **Step 1:** Scaffold with the files above. `health` returns `ai = bool(settings.GEMINI_API_KEYS)`.
-- [ ] **Step 2:** Run `cd backend && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt && .venv/Scripts/python manage.py check`.
+- [x] **Step 1:** Scaffold with the files above. `health` returns `ai = bool(settings.GEMINI_API_KEYS)`.
+- [x] **Step 2:** Run `cd backend && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt && .venv/Scripts/python manage.py check`.
   Expected: `System check identified no issues`. Then `python manage.py runserver 8000` and
   `curl localhost:8000/api/health` → `{"ok": true, "ai": false}`.
-- [ ] **Step 3:** Pitch docs: add a `progress.md` line ("Backend skeleti ishga tushdi").
-- [ ] **Step 4:** Commit `feat(api): django scaffold with health endpoint`, then sync and push. **Push within
+- [x] **Step 3:** Pitch docs: add a `progress.md` line ("Backend skeleti ishga tushdi").
+- [x] **Step 4:** Commit `feat(api): django scaffold with health endpoint`, then sync and push. **Push within
   30 min**, because B's AI app plugs into these stubs.
+- Note: Netlify proxies only `/api/*` and `/admin/*`, so `STATIC_URL="/admin/static/"`; WhiteNoise serves it before URL routing (curl with gunicorn, DEBUG=0: admin CSS 200).
 
 ### A2: Models + admin as the "operator panel" (P0)
 
