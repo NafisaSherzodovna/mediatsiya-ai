@@ -1,0 +1,20 @@
+{
+  "bhm_uzs": 440000,
+  "court_fee": { "percent": 4, "min_bhm": 1, "label": "Davlat boji (daʼvo bahosining 4 %, kamida 1 BHM)" },
+  "court_days": [30, 90],
+  "lawyer_uzs": 1000000,
+  "mediator_session_uzs": 300000,
+  "mediation_sessions": 2,
+  "mediation_days": [3, 14],
+  "fee_refund_note": "Mediatsiya muvaffaqiyatli boʻlsa, sudga toʻlangan davlat boji toʻliq qaytariladi.",
+  "notes": [
+    "Mediatsiya muvaffaqiyatli boʻlsa, sudga toʻlangan davlat boji toʻliq qaytariladi.",
+    "Kelishuvga erishilmasa, sudga borish huquqi saqlanadi.",
+    "Noprofessional mediator bepul ishlaydi, faqat xarajatlar qoplanadi."
+  ],
+  "sources": [
+    { "title": "Davlat boji toʻgʻrisida Qonun (OʻRQ-600)", "url": "https://lex.uz/uz/docs/-4680944" },
+    { "title": "Mediatsiya toʻgʻrisida Qonun (OʻRQ-482)", "url": "https://lex.uz/acts/3805227" },
+    { "title": "Kun.uz: mediatsiya haqida suhbat, 2025", "url": "https://kun.uz/news/2025/09/30/cudga-muqobil-lekin-nizoni-tez-va-kam-xarajat-hal-etishda-ancha-samarali-ozbekistonda-mediatsiya-haqida-suhbat" }
+  ]
+}

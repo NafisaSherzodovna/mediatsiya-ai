@@ -50,7 +50,7 @@ sees live statistics.
   - Locally they live in `backend/.env` (git-ignored); on EC2 in `/etc/mediatsiya.env`.
   - Demo login passwords are public on purpose (`contract/api.md`).
 - **AI calls:**
-  - Budget: 20 s total, 8 s per attempt.
+  - Budget: 20 s total, 10 s per attempt; no `thinkingConfig` (measured fastest without it).
   - Model order comes from env `GEMINI_MODELS`, default `gemini-3.5-flash-lite,gemini-flash-latest`
     (`flash-lite` answered in 1–4 s at the last hackathon; `flash-latest` often returned 503).
   - Two keys (user request: "server busy → the other key").
@@ -58,7 +58,8 @@ sees live statistics.
     - 429, 500 or 503 → retry the same model with the next key;
     - once every key has failed on that model → next model;
     - 401/403 → drop the key for the rest of the process;
-    - timeout or 400 → next model straight away, because a hung model wastes the budget.
+    - timeout → the other key on the same model (flash-lite latency varies 5–20 s; measured), then next model;
+    - 400 → next model.
   - When everything fails, return the fallback with `source:"fallback"`.
   - Measured on 2026-11-20: `gemini-3.5-flash-lite` answered with 200 on both keys in 1.0–5.6 s;
     `gemini-flash-latest` gave 503 in 7.7 s on key 1 and a 20 s timeout on key 2. Keep `flash-lite` first.

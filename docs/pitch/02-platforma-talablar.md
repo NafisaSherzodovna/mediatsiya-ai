@@ -54,13 +54,13 @@ AI mediatsiyaga yetib borish yo'lidagi to'siqlarni olib tashlaydi: odam bilmaydi
 
 | ID | AI nima qiladi | Natija | MVP |
 | --- | --- | --- | --- |
-| AI-1 | Nizoni tasniflaydi: turi (qarz, ijara, oilaviy, iste'molchi, mehnat) va mediatsiyaga yaroqliligi | Nizo turi va qisqa izoh; jinoyat ishi bo'lsa "yaroqsiz" | Ha |
-| AI-2 | O'zbekcha (lotin va kirill) hamda ruscha matnni tushunadi, ovozni matnga aylantiradi | Matnli nizo tavsifi | Ha |
-| AI-3 | Sud va mediatsiyani taxminiy vaqt va xarajat bo'yicha taqqoslaydi | Taqqoslash jadvali va manbasi | Ha |
-| AI-4 | Ikkinchi tomonga betaraf, hujumsiz taklif yozadi va unga ham foydasini tushuntiradi | Murojaatchi tahrirlay oladigan xabar matni | Ha |
-| AI-5 | Har bir tomonning pozitsiyasini alohida savollar bilan aniqlaydi | Ikkala tomonning talablari va umumiy nuqtalari | Ha |
-| AI-6 | Mediator uchun ma'lumotnoma tayyorlaydi | 1 sahifa: faktlar, talablar, kelishuv mumkin bo'lgan oraliq | Ha |
-| AI-7 | Qonun talablariga mos kelishuv loyihasini tuzadi | Tahrirlanadigan kelishuv matni | Ha |
+| AI-1 | Nizoni tasniflaydi: turi (qarz, ijara, oilaviy, iste'molchi, mehnat) va mediatsiyaga yaroqliligi | Nizo turi va qisqa izoh; jinoyat ishi bo'lsa "yaroqsiz" | Tayyor |
+| AI-2 | O'zbekcha (lotin va kirill) hamda ruscha matnni tushunadi, ovozni matnga aylantiradi | Matnli nizo tavsifi | Tayyor |
+| AI-3 | Sud va mediatsiyani taxminiy vaqt va xarajat bo'yicha taqqoslaydi | Taqqoslash jadvali va manbasi | Tayyor |
+| AI-4 | Ikkinchi tomonga betaraf, hujumsiz taklif yozadi va unga ham foydasini tushuntiradi | Murojaatchi tahrirlay oladigan xabar matni | Tayyor |
+| AI-5 | Har bir tomonning pozitsiyasini alohida savollar bilan aniqlaydi | Ikkala tomonning talablari va umumiy nuqtalari | Tayyor |
+| AI-6 | Mediator uchun ma'lumotnoma tayyorlaydi | 1 sahifa: faktlar, talablar, kelishuv mumkin bo'lgan oraliq | Tayyor |
+| AI-7 | Qonun talablariga mos kelishuv loyihasini tuzadi | Tahrirlanadigan kelishuv matni | Tayyor |
 | AI-8 | Javoblarni lex.uz'dagi qonun matnlariga (RAG) asoslaydi | Har bir huquqiy fikr yonida modda havolasi | Ha |
 
 Cheklovlar:

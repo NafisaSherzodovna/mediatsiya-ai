@@ -99,12 +99,12 @@ Order when time is short:
   - stays short (≤ 120 words per field);
   - for the invite: no accusation, explains the benefit to both sides, ends with one clear next step.
 
-- [ ] **Step 1:** Write the files. Add `GEMINI_API_KEYS` to `backend/.env` (the keys are in the team chat or
+- [x] **Step 1:** Write the files. Add `GEMINI_API_KEYS` to `backend/.env` (the keys are in the team chat or
   `D:\projects\ai-xakaton\ildiz-env-local.txt`; never commit them).
-- [ ] **Step 2:** Smoke-test from the shell:
+- [x] **Step 2:** Smoke-test from the shell:
   `python -c "import django,os;os.environ['DJANGO_SETTINGS_MODULE']='config.settings';django.setup();from ai.client import generate_text;print(generate_text('Javob: salom',[{'text':'Salom de'}]))"`.
   It prints Uzbek text, and the log shows `-> OK`.
-- [ ] **Step 3:** Pitch docs: `progress.md` line ("Gemini ulandi: kalit/model almashinuvi bilan").
+- [x] **Step 3:** Pitch docs: `progress.md` line ("Gemini ulandi: kalit/model almashinuvi bilan").
   Commit `feat(ai): gemini client with failover`, then push.
 
 ### B3: AI classify, compare and invite with fallbacks (P0)
@@ -138,16 +138,16 @@ Order when time is short:
   "taxminiy" in the UI.
 - `fallbacks.invite(...)` is a template; the fixture text is a good example.
 
-- [ ] **Step 1:** Write `backend/ai/tests.py` with exactly **two** tests. Both set `settings.GEMINI_API_KEYS=""` so
+- [x] **Step 1:** Write `backend/ai/tests.py` with exactly **two** tests. Both set `settings.GEMINI_API_KEYS=""` so
   the fallback runs; these are the stage failures that would hurt most.
   - `test_classify_fallback_cyrillic`: text "Ижарачим 3 ойдан бери тўламаяпти, қарзи 9 миллион" → 200,
     `dispute_type=="ijara"`, `mediable is True`, `amount_uzs==9000000`, `source=="fallback"`.
   - `test_classify_criminal_not_mediable`: "Qoʻshnim meni urdi va telefonimni oʻgʻirladi" → `mediable is False`.
 
   Check the short-text 400 and the Latin input by hand with `curl`.
-- [ ] **Step 2:** Implement until `python manage.py test ai` passes. Then hit each endpoint once with a real key
+- [x] **Step 2:** Implement until `python manage.py test ai` passes. Then hit each endpoint once with a real key
   and check the Uzbek quality by reading it.
-- [ ] **Step 3:** Pitch docs: `progress.md`, `research.md` (cost numbers + sources), `02` doc AI-1, AI-3, AI-4 → `Tayyor`.
+- [x] **Step 3:** Pitch docs: `progress.md`, `research.md` (cost numbers + sources), `02` doc AI-1, AI-3, AI-4 → `Tayyor`.
   Commit `feat(ai): classify, compare, invite with rule fallbacks`, then push.
 
 ### B4: Voice transcription (P1)
@@ -163,9 +163,9 @@ Order when time is short:
   - Sends `inline_data audio/ogg` with the prompt "Ushbu nutqni soʻzma-soʻz yozib bering. Oʻzbekcha boʻlsa,
     lotin yozuvida (oʻ, gʻ bilan)."
   - On failure → `{text:"", source:"fallback"}` with 200.
-- [ ] **Step 1:** Implement. Verify with a 5 s Uzbek recording (record one in the browser after B6, or use
+- [x] **Step 1:** Implement. Verify with a 5 s Uzbek recording (record one in the browser after B6, or use
   any `.webm`/`.m4a`) → the transcript reads correctly.
-- [ ] **Step 2:** Pitch docs: `progress.md`, AI-2 → `Tayyor`. Commit `feat(ai): voice transcription via ffmpeg + gemini`, then push.
+- [x] **Step 2:** Pitch docs: `progress.md`, AI-2 → `Tayyor`. Commit `feat(ai): voice transcription via ffmpeg + gemini`, then push.
   Open the issue `[for-A] install ffmpeg on EC2` if A4 is done without it.
 
 ### B5: Landing, login, app shell (P0)
@@ -266,8 +266,8 @@ Order when time is short:
 - The agreement prompt must produce numbered clauses. `citations` = a static list
   `[{article:"Mediatsiya toʻgʻrisidagi qonun", title:"Mediativ kelishuv", url:"https://lex.uz/acts/3805227"}]`
   until B15 replaces it with retrieval.
-- [ ] **Step 1:** Implement. Check each endpoint once with a real key using the fixture inputs, and read the Uzbek.
-- [ ] **Step 2:** Pitch docs: `progress.md`, AI-5/6/7 → `Tayyor`. Commit `feat(ai): position, brief, agreement`, then push.
+- [x] **Step 1:** Implement. Check each endpoint once with a real key using the fixture inputs, and read the Uzbek.
+- [x] **Step 2:** Pitch docs: `progress.md`, AI-5/6/7 → `Tayyor`. Commit `feat(ai): position, brief, agreement`, then push.
 
 ### B10: Claimant case page and mediator booking (P0)
 
