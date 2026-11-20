@@ -16,6 +16,7 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
   claimant: [
     { href: "/ishlar", label: "Ishlarim" },
     { href: "/murojaat", label: "Yangi murojaat" },
+    { href: "/huquq", label: "Huquqiy yordamchi" },
   ],
   mediator: [{ href: "/mediator", label: "Ishlar" }],
   ministry: [{ href: "/vazirlik", label: "Statistika" }],

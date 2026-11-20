@@ -372,8 +372,8 @@ Order when time is short:
   `normalize`d tokens.
 - `POST /api/ai/ask/` answers only from the retrieved articles and cites them.
 - `/ai/agreement/` swaps its static citations for `top_k(terms)`.
-- [ ] **Step 1:** Implement. Check "Mediativ kelishuv bajarilmasa nima boʻladi?" → the answer cites the right article.
-- [ ] **Step 2:** Pitch docs: `progress.md`, AI-8 → `Tayyor`. Commit `feat(ai): law q&a with bm25 retrieval`, then push.
+- [x] **Step 1:** Implement. Check "Mediativ kelishuv bajarilmasa nima boʻladi?" → the answer cites the right article.
+- [x] **Step 2:** Pitch docs: `progress.md`, AI-8 → `Tayyor`. Commit `feat(ai): law q&a with bm25 retrieval`, then push.
 
 ### B16: Freeze — final deploy and pitch-docs pass (P0, deadline −1:00)
 

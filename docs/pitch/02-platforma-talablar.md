@@ -61,7 +61,7 @@ AI mediatsiyaga yetib borish yo'lidagi to'siqlarni olib tashlaydi: odam bilmaydi
 | AI-5 | Har bir tomonning pozitsiyasini alohida savollar bilan aniqlaydi | Ikkala tomonning talablari va umumiy nuqtalari | Tayyor |
 | AI-6 | Mediator uchun ma'lumotnoma tayyorlaydi | 1 sahifa: faktlar, talablar, kelishuv mumkin bo'lgan oraliq | Tayyor |
 | AI-7 | Qonun talablariga mos kelishuv loyihasini tuzadi | Tahrirlanadigan kelishuv matni | Tayyor |
-| AI-8 | Javoblarni lex.uz'dagi qonun matnlariga (RAG) asoslaydi | Har bir huquqiy fikr yonida modda havolasi | Ha |
+| AI-8 | Javoblarni lex.uz'dagi qonun matnlariga (RAG) asoslaydi | Har bir huquqiy fikr yonida modda havolasi | Tayyor |
 
 Cheklovlar:
 

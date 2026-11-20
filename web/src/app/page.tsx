@@ -95,6 +95,9 @@ export default function Landing() {
             <a href="#raqamlar" className="rounded-lg px-3 py-2 hover:bg-ink-wash hover:text-ink">
               Raqamlar
             </a>
+            <Link href="/huquq" className="rounded-lg px-3 py-2 hover:bg-ink-wash hover:text-ink">
+              Huquqiy yordamchi
+            </Link>
           </nav>
           <div className="ml-auto flex gap-2">
             <Button asChild variant="outline" size="sm">

@@ -163,9 +163,10 @@ def brief(request):
 
 def _citations(terms: list[str]) -> list[dict]:
     try:
-        from .retrieval import top_k  # B15; optional
+        from .retrieval import _index  # B15: the agreement always rests on art. 29 (form) and 29¹ (enforcement)
 
-        hits = top_k(" ".join(terms) or "mediativ kelishuv", k=2)
+        docs, _ = _index()
+        hits = [d for d in docs if d["article"] in ("29-modda", "29¹-modda")]
         return [{"article": h["article"], "title": h["title"], "url": h["url"]} for h in hits] or STATIC_CITATIONS
     except Exception:  # noqa: BLE001 - corpus missing or not built yet
         return STATIC_CITATIONS

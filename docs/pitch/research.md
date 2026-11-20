@@ -13,6 +13,16 @@ Hakamlarga koʻrsatiladigan har bir raqam shu yerda manbasi bilan turadi. Manbas
 | Oʻzbekistonda mediatsiya natijalari boʻyicha alohida statistika yuritilmaydi | [EBRD hisoboti](https://www.ebrd.com/content/dam/ebrd_dxp/assets/pdfs/legal-reform/dispute-resolution/country-reports/country%20report%20uzbekistan.pdf) | 2026-11-20 |
 | "Mediatsiya toʻgʻrisida"gi Qonun, 2018-yil 3-iyul, OʻRQ-482, 2019-yil 1-yanvardan kuchda | [lex.uz](https://lex.uz/acts/3805227) | 2026-11-20 |
 
+## Qonun matnidan (lex.uz, amaldagi tahrir, 2026-11-20 da yuklab olindi)
+
+| Fakt va qiymat | Manba | Tekshirilgan sana |
+|---|---|---|
+| **29¹-modda (OʻRQ-1089, 20.10.2025):** mediativ kelishuv taraflar uchun majburiy kuchga ega; ixtiyoriy bajarilmasa, majburiy ijro uchun sudga murojaat qilish mumkin. Ilgari "tekshirish kerak" deb belgilangan daʼvo **tasdiqlandi** | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
+| **9¹-modda:** Adliya vazirligi mediatsiya sohasidagi vakolatli davlat organi; mediatorlar tomonidan **statistika maʼlumotlarini taqdim etish tartibini belgilaydi va tahlil qiladi**. Vazirlik paneli aynan shu vakolatga xizmat qiladi | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
+| **12¹-modda:** reyestrga kirish uchun oliy maʼlumot, maxsus oʻquv kursi va malaka imtihoni; advokat va notariuslar imtihondan ozod | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
+| **28-modda:** mediator faoliyati haq evaziga yoki tekin boʻlishi mumkin | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
+| **29-modda:** kelishuvda taraflar, huquq-majburiyatlar, bajarish shartlari va muddatlari boʻlishi shart; taraflar imzolaydi, mediator tasdiqlaydi. AI kelishuv loyihasi shu talablarga mos tuziladi | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
+
 ## Taqqoslash ekrani uchun (`backend/ai/data/costs.json`)
 
 | Fakt va qiymat | Manba | Tekshirilgan sana |
@@ -31,6 +41,4 @@ Hakamlarga koʻrsatiladigan har bir raqam shu yerda manbasi bilan turadi. Manbas
 
 ## Tekshirish kerak
 
-- 2025-yil 20-oktyabrdagi OʻRQ-1089 qonuni mediativ kelishuvga ijro kuchini berganmi? Manba: rasmiy
-  taqrizdan oʻtmagan Zenodo maqolasi. lex.uz'dan tasdiqlash kerak.
 - Davlat boji stavkasi, sud muddati, advokat va mediator narxi. Bular B3 vazifasida toʻldiriladi.
