@@ -9,9 +9,14 @@ import useSWR from "swr";
 import { Avatar } from "@/components/brand/bits";
 import { CaseHeader, PositionCard, Timeline } from "@/components/case/parts";
 import { BookingDialog } from "@/components/mediators/booking";
+import { PartyApproval } from "@/components/room/approval";
+import { ChatPanel } from "@/components/room/chat";
+import { MeetingsPanel } from "@/components/room/meetings";
+import { RoomTabs } from "@/components/room/tabs";
 import { AppShell } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
+import { useRoom } from "@/lib/rooms";
 import { dateUz } from "@/lib/format";
 import type { Case } from "@/lib/types";
 import { useOrigin } from "@/lib/use-origin";
@@ -28,7 +33,9 @@ export default function CasePage({ params }: { params: Promise<{ id: string }> }
 function CaseView({ id }: { id: string }) {
   const { data, error, mutate } = useSWR<Case>(`/cases/${id}/`, (p: string) => api<Case>(p), { refreshInterval: 4000 });
   const [booking, setBooking] = useState(false);
+  const [tab, setTab] = useState<"holat" | "chat" | "uchrashuv" | "kelishuv">("holat");
   const origin = useOrigin();
+  const { data: room, mutate: refreshRoom } = useRoom(data?.mediator ? { kind: "case", id } : null);
 
   if (error) return <p className="text-stop">Ish topilmadi.</p>;
   if (!data) return <div className="h-64 animate-pulse rounded-2xl bg-muted" />;
@@ -42,7 +49,48 @@ function CaseView({ id }: { id: string }) {
       </Link>
       <CaseHeader item={c} />
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      {room && (
+        <div className="mt-6">
+          <RoomTabs
+            id="claimant"
+            value={tab}
+            onChange={setTab}
+            tabs={[
+              { value: "holat", label: "Holat" },
+              { value: "chat", label: "Mediator bilan suhbat", badge: room.threads[0]?.unread },
+              { value: "uchrashuv", label: "Uchrashuvlar", badge: room.meetings.filter((m) => m.status === "proposed").length },
+              {
+                value: "kelishuv",
+                label: "Kelishuv",
+                badge: room.agreement && !(room.approvals.claimant?.current) && c.status !== "agreed" ? 1 : 0,
+              },
+            ]}
+          />
+        </div>
+      )}
+      {room && tab === "chat" && (
+        <div className="mt-6 max-w-3xl">
+          <ChatPanel
+            target={{ kind: "case", id }}
+            party="claimant"
+            me="claimant"
+            title={room.mediator?.name ?? "Mediator"}
+            subtitle={`Mediator · ${room.mediator?.registry_no ?? ""}`}
+          />
+        </div>
+      )}
+      {room && tab === "uchrashuv" && (
+        <div className="mt-6">
+          <MeetingsPanel room={room} target={{ kind: "case", id }} onChange={() => void refreshRoom()} />
+        </div>
+      )}
+      {room && tab === "kelishuv" && (
+        <div className="mt-6 max-w-3xl">
+          <PartyApproval room={room} target={{ kind: "case", id }} party="claimant" onChange={() => void refreshRoom()} />
+        </div>
+      )}
+
+      <div className={`mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr] ${room && tab !== "holat" ? "hidden" : ""}`}>
         <div className="space-y-6">
           <NextAction c={c} link={link} onBook={() => setBooking(true)} />
 

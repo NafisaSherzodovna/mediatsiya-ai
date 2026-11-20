@@ -15,6 +15,7 @@ urlpatterns = [
     path("api/", include("mediators.urls")),
     path("api/stats/", include("stats.urls")),
     path("api/ai/", include("ai.urls")),
+    path("api/rooms/", include("rooms.urls")),
     path("api/demo/", include("demo.urls")),
     path("admin/", admin.site.urls),
 ]

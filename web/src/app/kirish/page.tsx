@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api, errorText } from "@/lib/api";
 import { saveSession } from "@/lib/auth";
-import { ROLE_HOME } from "@/lib/labels";
+import { homeFor } from "@/lib/labels";
 import type { LoginResponse } from "@/lib/types";
 
 const DEMO = [
@@ -35,8 +35,7 @@ function LoginForm() {
     try {
       const res = await api<LoginResponse>("/auth/login/", { body: { username: u, password: p } });
       saveSession(res);
-      const next = params.get("next");
-      router.push(next && next.startsWith("/") ? next : ROLE_HOME[res.user.role]);
+      router.push(homeFor(res.user.role, params.get("next")));
     } catch (e) {
       setError(errorText(e));
       setBusy(false);

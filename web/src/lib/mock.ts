@@ -24,6 +24,9 @@ import type {
   InvitePublic,
   LoginResponse,
   Mediator,
+  Meeting,
+  RoomMessage,
+  RoomParty,
   Position,
   Region,
   Stats,
@@ -72,6 +75,7 @@ function save(cases: Case[]) {
 export function resetMock() {
   try {
     window.localStorage.removeItem(STORE_KEY);
+    window.localStorage.removeItem(ROOMS_KEY);
   } catch {
     /* ignore */
   }
@@ -199,6 +203,161 @@ function mockPosition(answers: { q: string; a: string }[]): Position {
   };
 }
 
+// ---------- rooms (chat, meetings, approvals) ----------
+
+type RoomsStore = {
+  messages: (RoomMessage & { caseId: string; readM: boolean; readP: boolean })[];
+  meetings: (Meeting & { caseId: string })[];
+  approvals: Record<string, Partial<Record<RoomParty, { decision: "approved" | "changes"; comment: string; at: string; hash: string }>>>;
+};
+const ROOMS_KEY = "ma.mock.rooms.v1";
+
+function loadRooms(): RoomsStore {
+  try {
+    const raw = window.localStorage.getItem(ROOMS_KEY);
+    if (raw) return JSON.parse(raw) as RoomsStore;
+  } catch {
+    /* fresh */
+  }
+  return { messages: [], meetings: [], approvals: {} };
+}
+function saveRooms(r: RoomsStore) {
+  try {
+    window.localStorage.setItem(ROOMS_KEY, JSON.stringify(r));
+  } catch {
+    /* ignore */
+  }
+}
+
+function agreementHash(a: Agreement | null): string {
+  return a ? JSON.stringify({ t: a.title, c: a.clauses }) : "";
+}
+
+function approvalsOf(r: RoomsStore, c: Case) {
+  const h = agreementHash(c.agreement);
+  const a = r.approvals[c.id] ?? {};
+  const one = (p: RoomParty) => {
+    const x = a[p];
+    return x ? { decision: x.decision, comment: x.comment, at: x.at, current: !!h && x.hash === h } : null;
+  };
+  return { claimant: one("claimant"), respondent: one("respondent") };
+}
+
+export function mockBothApproved(c: Case): boolean {
+  const s = approvalsOf(loadRooms(), c);
+  return [s.claimant, s.respondent].every((x) => x && x.current && x.decision === "approved");
+}
+
+function roomOf(c: Case, viewer: "mediator" | RoomParty) {
+  const r = loadRooms();
+  const parties: RoomParty[] = viewer === "mediator" ? ["claimant", "respondent"] : [viewer];
+  const names = { claimant: c.claimant.name, respondent: c.respondent.name || "Ikkinchi tomon" };
+  return {
+    case_id: c.id,
+    code: c.code,
+    status: c.status,
+    viewer,
+    mediator: c.mediator ? { name: c.mediator.name, registry_no: c.mediator.registry_no } : null,
+    names,
+    threads: parties.map((p) => {
+      const msgs = r.messages.filter((m) => m.caseId === c.id && m.party === p);
+      const unread = msgs.filter((m) => (viewer === "mediator" ? m.sender !== "mediator" && !m.readM : m.sender === "mediator" && !m.readP)).length;
+      const last = msgs.at(-1);
+      return { party: p, name: names[p], unread, last: last ?? null };
+    }),
+    meetings: r.meetings.filter((m) => m.caseId === c.id && parties.includes(m.party) && m.status !== "cancelled"),
+    agreement: c.agreement,
+    agreement_hash: agreementHash(c.agreement),
+    approvals: approvalsOf(r, c),
+  };
+}
+
+function roomRoute(method: string, rest: string, c: Case, viewer: "mediator" | RoomParty, body: Record<string, unknown>, query: URLSearchParams): unknown {
+  const r = loadRooms();
+  if (rest === "") return roomOf(c, viewer);
+  if (rest === "messages/") {
+    if (!c.mediator) throw new MockError(403, "Mediator hali tayinlanmagan");
+    const party = (viewer === "mediator" ? (query.get("party") ?? body.party) : viewer) as RoomParty;
+    if (method === "POST") {
+      const text = String(body.text ?? "").trim();
+      if (!text) throw new MockError(400, "Xabar boʻsh");
+      const m = { id: uid(), caseId: c.id, party, sender: viewer, text, at: now(), readM: viewer === "mediator", readP: viewer !== "mediator" };
+      r.messages.push(m);
+      saveRooms(r);
+      return m;
+    }
+    const list = r.messages.filter((m) => m.caseId === c.id && m.party === party);
+    list.forEach((m) => (viewer === "mediator" ? (m.readM = true) : (m.readP = true)));
+    saveRooms(r);
+    return list;
+  }
+  if (rest === "meetings/" && method === "POST") {
+    if (viewer !== "mediator") throw new MockError(403, "Uchrashuvni faqat mediator belgilaydi");
+    const start = new Date(String(body.start));
+    const minutes = Number(body.minutes ?? 45);
+    if (Number.isNaN(start.getTime())) throw new MockError(400, "Tomon va vaqtni tanlang");
+    if (start.getTime() < Date.now()) throw new MockError(400, "Oʻtib ketgan vaqtni tanlab boʻlmaydi");
+    const end = start.getTime() + minutes * 60_000;
+    const other = r.meetings.find((m) => {
+      if (m.status === "declined" || m.status === "cancelled") return false;
+      const st = new Date(m.start).getTime();
+      return st < end && st + m.minutes * 60_000 > start.getTime();
+    });
+    if (other) {
+      const who = other.party === "claimant" ? "murojaatchi" : "ikkinchi tomon";
+      throw new MockError(409, `Bu vaqtda ${who} bilan uchrashuv bor. Boshqa vaqt tanlang.`);
+    }
+    const m = {
+      id: uid(),
+      caseId: c.id,
+      party: body.party as RoomParty,
+      start: start.toISOString(),
+      minutes,
+      mode: (body.mode as "online" | "ofis") ?? "online",
+      place: String(body.place ?? ""),
+      note: String(body.note ?? ""),
+      status: "proposed" as const,
+    };
+    r.meetings.push(m);
+    r.messages.push({ id: uid(), caseId: c.id, party: m.party, sender: "mediator", text: "Uchrashuv taklif qilindi. Iltimos, tasdiqlang.", at: now(), readM: true, readP: false });
+    saveRooms(r);
+    return m;
+  }
+  const mm = rest.match(/^meetings\/([^/]+)\/$/);
+  if (mm) {
+    const m = r.meetings.find((x) => x.id === mm[1] && x.caseId === c.id);
+    if (!m) throw new MockError(404, "Uchrashuv topilmadi");
+    const status = body.status as Meeting["status"];
+    if (viewer === "mediator") {
+      if (status !== "cancelled") throw new MockError(400, "Mediator faqat bekor qila oladi");
+    } else if (m.status !== "proposed") throw new MockError(400, "Bu uchrashuvga allaqachon javob berilgan");
+    m.status = status;
+    saveRooms(r);
+    return m;
+  }
+  if (rest === "approve/") {
+    if (viewer === "mediator") throw new MockError(403, "Kelishuvni faqat tomonlar tasdiqlaydi");
+    if (!c.agreement) throw new MockError(400, "Kelishuv loyihasi hali yoʻq");
+    r.approvals[c.id] = {
+      ...(r.approvals[c.id] ?? {}),
+      [viewer]: { decision: body.decision as "approved", comment: String(body.comment ?? ""), at: now(), hash: agreementHash(c.agreement) },
+    };
+    r.messages.push({
+      id: uid(),
+      caseId: c.id,
+      party: viewer,
+      sender: viewer,
+      text: body.decision === "approved" ? "Kelishuv loyihasini tasdiqladi." : `Kelishuvga oʻzgartirish soʻradi: ${String(body.comment || "—")}`,
+      at: now(),
+      readM: false,
+      readP: true,
+    });
+    saveRooms(r);
+    return { approvals: approvalsOf(r, c) };
+  }
+  throw new MockError(404, "Topilmadi");
+}
+
 // ---------- router ----------
 
 type Req = { method: string; path: string; body?: unknown; user: User | null };
@@ -241,6 +400,22 @@ export async function mockRoute<T>({ method, path, body, user }: Req): Promise<T
   }
 
   if (p === "/stats/") return ok(statsFx as Stats);
+
+  if (p.startsWith("/rooms/")) {
+    const all = load();
+    const t = p.match(/^\/rooms\/t\/([^/]+)\/(.*)$/);
+    if (t) {
+      const c = all.find((x) => x.invite_token === t[1]);
+      if (!c) throw new MockError(404, "Taklif topilmadi yoki muddati oʻtgan");
+      return ok(roomRoute(method, t[2], c, "respondent", b, query));
+    }
+    const mt = p.match(/^\/rooms\/meetings\/([^/]+)\/$/);
+    const caseId = mt ? loadRooms().meetings.find((m) => m.id === mt[1])?.caseId : p.split("/")[2];
+    const c = all.find((x) => x.id === caseId);
+    if (!c || !user) throw new MockError(404, "Ish topilmadi");
+    const viewer = user.role === "mediator" || user.role === "admin" ? "mediator" : "claimant";
+    return ok(roomRoute(method, mt ? `meetings/${mt[1]}/` : p.split("/").slice(3).join("/"), c, viewer, b, query));
+  }
 
   const cases = load();
 
@@ -290,6 +465,7 @@ export async function mockRoute<T>({ method, path, body, user }: Req): Promise<T
       setStatus(c, "scheduled");
     } else if (method === "PATCH") {
       const { status, ...rest } = b as Partial<Case>;
+      if (status === "agreed" && !mockBothApproved({ ...c, ...rest } as Case)) throw new MockError(400, "Ikkala tomon kelishuv loyihasini tasdiqlamagan");
       Object.assign(c, rest);
       if (status) setStatus(c, status);
       if (status === "agreed") c.agreed_at = now();

@@ -104,6 +104,13 @@ def case_detail(request, pk):
         if error := invalid(ser):
             return error
         status = ser.validated_data.pop("status", None)
+        if status == CaseStatus.AGREED:
+            from rooms.logic import both_approved  # B: rooms app
+
+            probe = Case(agreement=ser.validated_data.get("agreement", case.agreement))
+            probe.pk = case.pk
+            if not both_approved(probe):
+                return Response({"detail": "Ikkala tomon kelishuv loyihasini tasdiqlamagan"}, status=400)
         with transaction.atomic():
             ser.save()
             if status:

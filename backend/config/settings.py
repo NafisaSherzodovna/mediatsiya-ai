@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "mediators",
     "stats",
     "ai",
+    "rooms",
     "demo",
 ]
 

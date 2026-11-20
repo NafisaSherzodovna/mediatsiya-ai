@@ -386,3 +386,19 @@ Order when time is short:
   - the 8 % / 40–80 % figures read "masala shartida keltirilgan", with the verified numbers next to them.
   - Refresh `links.md` and `research.md`.
 - [ ] **Step 3:** Commit `docs(pitch): final state for the demo`, then push. Tell the user what is live and what is mocked.
+
+### B17: Mediation rooms (user request, 2026-11-20) — done
+
+- **Backend:** new app `backend/rooms/` with models `Message`, `Meeting` and `Approval`, and the endpoints in
+  `contract/api.md` "Rooms". The test `rooms.test_meeting_clash_and_agreement_gate` covers both rules.
+- **Guard:** `PATCH /api/cases/{id}/ {status:"agreed"}` returns 400 until both parties approve the current text.
+  This is a small change in A's `cases/views.py`; A is told in an issue.
+- **Frontend:** messenger chat (`components/room/chat.tsx`), mediator inbox, meetings (taken slots disabled,
+  Tashkent time) and approval panels.
+  - Mediator tabs: Ish / Suhbatlar / Uchrashuvlar.
+  - Claimant tabs: Holat / Suhbat / Uchrashuvlar / Kelishuv.
+  - The respondent's room sits on the invite link.
+- **Fixes in the same task:**
+  - login with `?next=` of another role (mediator and ministry bounced back to the login page);
+  - LAN access to the dev server;
+  - a "Kabinetga qaytish" button after sending the invite.

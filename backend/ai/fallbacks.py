@@ -91,7 +91,7 @@ def brief(summary: str, amount_uzs: int | None, cp: dict | None, rp: dict | None
     common = ["Ikkala tomon masalani sudsiz hal qilishga rozi"]
     if shared:
         common.append("Umumiy tayanch: " + ", ".join(sorted(shared)[:4]))
-    offer = (rp.get("can_offer") or ["boʻlib toʻlash"])[0]
+    offer = (rp.get("can_offer") or ["boʻlib toʻlash"])[0].strip().rstrip(".;")
     facts = [summary] + ([f"Nizo summasi: {amount_uzs:,} soʻm".replace(",", " ")] if amount_uzs else [])
     return {
         "facts": facts,
@@ -106,7 +106,7 @@ def brief(summary: str, amount_uzs: int | None, cp: dict | None, rp: dict | None
 
 def agreement(code: str, claimant: str, respondent: str, dispute_type: str, amount_uzs: int | None, terms: list[str]) -> dict:
     money = f"{amount_uzs:,} soʻm".replace(",", " ") if amount_uzs else "kelishilgan summa"
-    agreed = "; ".join(terms) if terms else f"{money} kelishilgan jadval asosida toʻlanadi"
+    agreed = "; ".join(t.strip().rstrip(".;") for t in terms) if terms else f"{money} kelishilgan jadval asosida toʻlanadi"
     return {
         "title": f"Mediativ kelishuv № {code}",
         "clauses": [

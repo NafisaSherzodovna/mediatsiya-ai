@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, FileDown, FileSignature, Plus, Sparkles, Stamp, X } from "lucide-react";
+import { ArrowLeft, Check, FileDown, FileSignature, PenLine, Plus, Send, Sparkles, Stamp, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { use, useState } from "react";
@@ -11,10 +11,15 @@ import { AiThinking } from "@/components/brand/ai-thinking";
 import { AiSourceChip } from "@/components/brand/bits";
 import { Seal } from "@/components/brand/seal";
 import { BriefCard } from "@/components/case/agreement";
+import { ApprovalStatus } from "@/components/room/approval";
+import { MediatorInbox } from "@/components/room/inbox";
+import { MeetingsPanel } from "@/components/room/meetings";
+import { RoomTabs } from "@/components/room/tabs";
 import { CaseHeader, PositionCard, Timeline } from "@/components/case/parts";
 import { AppShell } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
 import { api, errorText } from "@/lib/api";
+import { useRoom } from "@/lib/rooms";
 import type { Agreement, Brief, Case } from "@/lib/types";
 
 export default function MediatorCasePage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,6 +32,7 @@ export default function MediatorCasePage({ params }: { params: Promise<{ id: str
 }
 
 type Stage = "idle" | "briefing" | "drafting" | "editing" | "sealing";
+type Tab = "ish" | "chat" | "uchrashuv";
 
 function Workspace({ id }: { id: string }) {
   const { data: c, mutate } = useSWR<Case>(`/cases/${id}/`, (p: string) => api<Case>(p));
@@ -37,6 +43,8 @@ function Workspace({ id }: { id: string }) {
   const [newTerm, setNewTerm] = useState("");
   const [draft, setDraft] = useState<Agreement | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState<Tab>("ish");
+  const { data: room, mutate: refreshRoom } = useRoom(c?.mediator ? { kind: "case", id } : null);
 
   if (!c) return <div className="h-64 animate-pulse rounded-2xl bg-muted" />;
   const brief = c.brief ?? pendingBrief;
@@ -90,11 +98,27 @@ function Workspace({ id }: { id: string }) {
     }
   }
 
-  async function seal() {
+  async function sendForApproval() {
     if (!c || !draft) return;
     setBusy(true);
     try {
-      const u = await api<Case>(`/cases/${c.id}/`, { method: "PATCH", body: { agreement: draft, status: "agreed" } });
+      const u = await api<Case>(`/cases/${c.id}/`, { method: "PATCH", body: { agreement: draft } });
+      await mutate(u, { revalidate: false });
+      setStage("idle");
+      void refreshRoom();
+      toast.success("Loyiha ikkala tomonga tasdiqlash uchun yuborildi");
+    } catch (e) {
+      toast.error(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function seal() {
+    if (!c) return;
+    setBusy(true);
+    try {
+      const u = await api<Case>(`/cases/${c.id}/`, { method: "PATCH", body: { status: "agreed" } });
       setStage("sealing");
       await mutate(u, { revalidate: false });
     } catch (e) {
@@ -105,6 +129,10 @@ function Workspace({ id }: { id: string }) {
   }
 
   const agreed = c.status === "agreed" || c.status === "closed";
+  const draftSent = !!c.agreement && !agreed;
+  const bothApproved = !!room && (["claimant", "respondent"] as const).every((p) => room.approvals[p]?.current && room.approvals[p]?.decision === "approved");
+  const unread = room?.threads.reduce((n, t) => n + t.unread, 0) ?? 0;
+  const pending = room?.meetings.filter((m) => m.status === "proposed").length ?? 0;
 
   return (
     <div>
@@ -113,7 +141,32 @@ function Workspace({ id }: { id: string }) {
       </Link>
       <CaseHeader item={c} />
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+      {room && (
+        <div className="mt-6">
+          <RoomTabs
+            id="mediator"
+            value={tab}
+            onChange={setTab}
+            tabs={[
+              { value: "ish", label: "Ish va kelishuv" },
+              { value: "chat", label: "Suhbatlar", badge: unread },
+              { value: "uchrashuv", label: "Uchrashuvlar", badge: pending },
+            ]}
+          />
+        </div>
+      )}
+      {room && tab === "chat" && (
+        <div className="mt-6">
+          <MediatorInbox room={room} target={{ kind: "case", id }} />
+        </div>
+      )}
+      {room && tab === "uchrashuv" && (
+        <div className="mt-6">
+          <MeetingsPanel room={room} target={{ kind: "case", id }} onChange={() => void refreshRoom()} />
+        </div>
+      )}
+
+      <div className={cn("mt-8 grid gap-6 lg:grid-cols-[1.5fr_1fr]", room && tab !== "ish" && "hidden")}>
         <div className="space-y-6">
           {/* 1. Brief */}
           {stage === "briefing" ? (
@@ -140,7 +193,7 @@ function Workspace({ id }: { id: string }) {
           )}
 
           {/* 2. Agreement */}
-          {brief && !agreed && stage !== "sealing" && stage !== "briefing" && (
+          {brief && !agreed && stage !== "sealing" && stage !== "briefing" && (!draftSent || stage === "editing" || stage === "drafting") && (
             <section className="sheet p-5 sm:p-6">
               <div className="flex items-center gap-2.5">
                 <FileSignature className="size-5 text-accord" />
@@ -183,8 +236,8 @@ function Workspace({ id }: { id: string }) {
                     <Button variant="ghost" onClick={() => setStage("idle")}>
                       Shartlarni oʻzgartirish
                     </Button>
-                    <Button size="lg" variant="accord" disabled={busy} onClick={seal}>
-                      <Stamp className="size-5" /> {busy ? "Saqlanmoqda…" : "Yakunlash va muhrlash"}
+                    <Button size="lg" variant="accord" disabled={busy} onClick={sendForApproval}>
+                      <Send className="size-5" /> {busy ? "Yuborilmoqda…" : "Tomonlarga tasdiqlashga yuborish"}
                     </Button>
                   </div>
                 </div>
@@ -237,6 +290,42 @@ function Workspace({ id }: { id: string }) {
                   </Button>
                 </div>
               )}
+            </section>
+          )}
+
+          {/* 2b. Waiting for both parties */}
+          {draftSent && stage !== "editing" && stage !== "drafting" && stage !== "sealing" && c.agreement && (
+            <section className="sheet p-5 sm:p-6">
+              <div className="flex items-center gap-2.5">
+                <FileSignature className="size-5 text-accord" />
+                <h2 className="text-xl font-semibold text-ink">Tomonlar tasdigʻi</h2>
+              </div>
+              <p className="mt-1 text-ink-soft">Loyiha ikkala tomonga yuborildi. Ikkalasi ham tasdiqlagachgina kelishuv muhrlanadi.</p>
+              <div className="mt-4">{room ? <ApprovalStatus room={room} /> : <div className="h-10 animate-pulse rounded-xl bg-muted" />}</div>
+              <div className="mt-4 rounded-xl border border-rule bg-paper/60 p-4 font-doc text-ink">
+                <p className="font-semibold">{c.agreement.title}</p>
+                <ol className="mt-2 space-y-1.5 text-[0.95rem]">
+                  {c.agreement.clauses.map((cl) => (
+                    <li key={cl.title}>
+                      <b>{cl.title}</b> {cl.body}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <div className="mt-5 flex flex-wrap justify-between gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setDraft(c.agreement);
+                    setStage("editing");
+                  }}
+                >
+                  <PenLine className="size-4" /> Loyihani tahrirlash
+                </Button>
+                <Button size="lg" variant="accord" disabled={busy || !bothApproved} onClick={seal} title={bothApproved ? undefined : "Ikkala tomon tasdiqlashi kerak"}>
+                  <Stamp className="size-5" /> {busy ? "Saqlanmoqda…" : bothApproved ? "Yakunlash va muhrlash" : "Tasdiqlar kutilmoqda"}
+                </Button>
+              </div>
             </section>
           )}
 

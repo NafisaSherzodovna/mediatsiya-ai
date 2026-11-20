@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   agentRules: false,
+  // open the dev server from a phone on the same Wi-Fi
+  allowedDevOrigins: ["10.*.*.*", "192.168.*.*", "172.16.*.*", "*.local"],
   // Django URLs end with "/"; without this Next strips the slash before the /api rewrite (POST -> Django 500).
   skipTrailingSlashRedirect: true,
   turbopack: {

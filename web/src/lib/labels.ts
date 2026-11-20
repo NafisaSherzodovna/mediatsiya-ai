@@ -61,6 +61,18 @@ export const ROLE_HOME: Record<Role, string> = {
   admin: "/vazirlik",
 };
 
+/** Paths each role may open. Used to ignore a `?next=` that belongs to another role. */
+const ROLE_PATHS: Record<Role, RegExp> = {
+  claimant: /^\/(ishlar|murojaat|huquq)(\/|$)/,
+  mediator: /^\/(mediator|huquq)(\/|$)|^\/ishlar\/[^/]+\/kelishuv$/,
+  ministry: /^\/(vazirlik|huquq)(\/|$)|^\/ishlar\/[^/]+(\/kelishuv)?$/,
+  admin: /^\//,
+};
+
+export function homeFor(role: Role, next?: string | null): string {
+  return next && next.startsWith("/") && !next.startsWith("//") && ROLE_PATHS[role].test(next) ? next : ROLE_HOME[role];
+}
+
 export const LANG_LABEL: Record<string, string> = { uz: "Oʻzbek", ru: "Rus", en: "Ingliz" };
 
 export const REGIONS = Object.keys(REGION_LABEL) as Region[];

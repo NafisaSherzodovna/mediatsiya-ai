@@ -478,6 +478,11 @@ export function SentStep({ item, link }: { item: Case; link: string }) {
           </Link>
         </Button>
       </div>
+      <Button asChild variant="ghost" className="mt-3">
+        <Link href="/ishlar">
+          <ArrowLeft className="size-4" /> Kabinetga qaytish
+        </Link>
+      </Button>
     </div>
   );
 }

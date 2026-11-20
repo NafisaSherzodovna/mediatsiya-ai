@@ -9,7 +9,7 @@ import { Logo } from "@/components/brand/logo";
 import { Avatar } from "@/components/brand/bits";
 import { Button } from "@/components/ui/button";
 import { logout, useUser } from "@/lib/auth";
-import { ROLE_LABEL } from "@/lib/labels";
+import { ROLE_HOME, ROLE_LABEL } from "@/lib/labels";
 import type { Role } from "@/lib/types";
 
 const NAV: Record<Role, { href: string; label: string }[]> = {
@@ -107,8 +107,10 @@ export function RequireRole({ roles, children }: { roles: Role[]; children: Reac
   const path = usePathname();
   const allowed = !!user && roles.includes(user.role);
   useEffect(() => {
-    if (ready && !allowed) router.replace(`/kirish?next=${encodeURIComponent(path)}`);
-  }, [ready, allowed, router, path]);
+    if (!ready || allowed) return;
+    // signed in with another role: go to that role's home instead of bouncing to the login page
+    router.replace(user ? ROLE_HOME[user.role] : `/kirish?next=${encodeURIComponent(path)}`);
+  }, [ready, allowed, router, path, user]);
   if (!ready || !allowed) {
     return (
       <div className="mx-auto mt-24 flex max-w-md flex-col items-center gap-3 text-ink-soft">

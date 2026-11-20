@@ -47,6 +47,9 @@ Uzoq muddatli maqsad: Oʻzbekistonda suddan tashqari hal qilinadigan nizolar ulu
 | FT-13 | Click yoki Payme orqali to'lov va komissiyani avtomatik ushlab qolish | Keyin |
 | FT-14 | Kompaniyalar uchun ishlarni Excel orqali ommaviy yuklash | Keyin |
 | FT-15 | Kelishuvga erishilmasa, sud yoki hakamlik sudiga yo'naltirish | Keyin |
+| FT-16 | Mediator va har bir tomon o'rtasida alohida, maxfiy chat (messenger ko'rinishida); ikkinchi tomon hisobsiz, taklif havolasi orqali kiradi | Tayyor |
+| FT-17 | Mediator har bir tomon bilan alohida uchrashuv belgilaydi; ikki tomon bilan uchrashuvlar bir vaqtga to'g'ri kelmaydi; uchrashuv tomon qabul qilgandagina belgilanadi | Tayyor |
+| FT-18 | Kelishuv loyihasi ikkala tomonga tasdiqlash uchun yuboriladi; ikkalasi tasdiqlamaguncha mediator muhrlay olmaydi; matn o'zgarsa, tasdiq qayta so'raladi | Tayyor |
 
 ## AI talablari
 

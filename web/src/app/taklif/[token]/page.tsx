@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AiThinking } from "@/components/brand/ai-thinking";
 import { Avatar } from "@/components/brand/bits";
 import { Logo } from "@/components/brand/logo";
+import { RespondentRoom } from "@/components/room/respondent-room";
 import { Button } from "@/components/ui/button";
 import { api, ApiError, errorText } from "@/lib/api";
 import { RESPONDENT_QUESTIONS, SAMPLE_RESPONDENT_ANSWERS, takeDemoPrefill } from "@/lib/demo";
@@ -87,10 +88,10 @@ export default function TaklifPage({ params }: { params: Promise<{ token: string
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className="mx-auto flex h-16 w-full max-w-xl items-center px-4">
+      <header className={`mx-auto flex h-16 w-full items-center px-4 ${phase === "closed" ? "max-w-4xl" : "max-w-xl"}`}>
         <Logo />
       </header>
-      <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-2 pb-16">
+      <main className={`mx-auto w-full flex-1 px-4 pt-2 pb-16 ${phase === "closed" ? "max-w-4xl" : "max-w-xl"}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={phase === "q" ? `q${qi}` : phase}
@@ -220,7 +221,7 @@ export default function TaklifPage({ params }: { params: Promise<{ token: string
               />
             )}
 
-            {phase === "accepted" && invite && <Accepted claimant={invite.claimant_name} />}
+            {phase === "accepted" && invite && <Accepted claimant={invite.claimant_name} onEnter={() => setPhase("closed")} />}
 
             {phase === "declined" && (
               <Centered icon={<X className="size-7" />} title="Javobingiz yuborildi">
@@ -228,11 +229,7 @@ export default function TaklifPage({ params }: { params: Promise<{ token: string
               </Centered>
             )}
 
-            {phase === "closed" && (
-              <Centered icon={<Check className="size-7" />} title="Bu taklifga allaqachon javob berilgan">
-                Ish davom etmoqda. Mediator siz bilan bogʻlanadi.
-              </Centered>
-            )}
+            {phase === "closed" && <RespondentRoom token={token} />}
           </motion.div>
         </AnimatePresence>
       </main>
@@ -254,7 +251,7 @@ function Centered({ icon, title, children }: { icon: React.ReactNode; title: str
 }
 
 /** The bridge moment: the two sides slide toward the centre and meet. */
-function Accepted({ claimant }: { claimant: string }) {
+function Accepted({ claimant, onEnter }: { claimant: string; onEnter: () => void }) {
   return (
     <div className="text-center">
       <div className="relative mx-auto mt-6 flex h-28 max-w-sm items-center justify-center">
@@ -285,6 +282,10 @@ function Accepted({ claimant }: { claimant: string }) {
           </li>
         ))}
       </ol>
+      <Button size="lg" variant="accord" className="mt-6" onClick={onEnter}>
+        Mediatsiya xonasiga oʻtish <ArrowRight className="size-4" />
+      </Button>
+      <p className="mx-auto mt-3 max-w-sm text-sm text-ink-soft">Shu havolani saqlab qoʻying: mediator bilan suhbat va uchrashuvlar shu yerda boʻladi.</p>
     </div>
   );
 }

@@ -127,7 +127,7 @@ task that owns it.
 | Path | Owner |
 |---|---|
 | `backend/config/**`, `backend/accounts/**`, `backend/cases/**`, `backend/mediators/**`, `backend/stats/**`, `backend/requirements.txt`, `deploy/**` | A |
-| `backend/ai/**`, `backend/demo/**` (A only creates the empty app stubs in A1), `web/**`, `netlify.toml`, `DESIGN.md`, `docs/pitch/**` | B |
+| `backend/ai/**`, `backend/demo/**`, `backend/rooms/**` (A only creates the empty app stubs in A1), `web/**`, `netlify.toml`, `DESIGN.md`, `docs/pitch/**` | B |
 | `contract/**` | shared, additive `[contract]` commits only |
 | `docs/plan/**`, `CLAUDE.md`, `scripts/**` | B (A may tick its own checkboxes in `A.md`) |
 

@@ -122,3 +122,32 @@ export type Stats = {
 };
 export type AiInvite = { text: string; checks: string[]; source: AiSource };
 export type AskAnswer = { answer: string; citations: Citation[]; source: AiSource };
+
+// ---- rooms (contract/api.md, "Rooms") ----
+export type RoomParty = "claimant" | "respondent";
+export type RoomMessage = { id: number | string; party: RoomParty; sender: "mediator" | RoomParty; text: string; at: string };
+export type MeetingStatus = "proposed" | "accepted" | "declined" | "cancelled";
+export type Meeting = {
+  id: string;
+  party: RoomParty;
+  start: string;
+  minutes: number;
+  mode: "online" | "ofis";
+  place: string;
+  note: string;
+  status: MeetingStatus;
+};
+export type ApprovalState = { decision: "approved" | "changes"; comment: string; at: string; current: boolean } | null;
+export type Room = {
+  case_id: string;
+  code: string;
+  status: CaseStatus;
+  viewer: "mediator" | RoomParty;
+  mediator: { name: string; registry_no: string } | null;
+  names: Record<RoomParty, string>;
+  threads: { party: RoomParty; name: string; unread: number; last: RoomMessage | null }[];
+  meetings: Meeting[];
+  agreement: Agreement | null;
+  agreement_hash: string;
+  approvals: Record<RoomParty, ApprovalState>;
+};
