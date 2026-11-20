@@ -357,7 +357,7 @@ Order when time is short:
     soʻm boʻldi" into the intake without a mic);
   - "Javoblarni avtomatik toʻldirish" for the respondent's 3 answers;
   - links that open the demo accounts.
-- [ ] **Step 1:** Implement and run `seed_demo --wipe` locally. Check that `/vazirlik` shows 278 / 61.5 %.
+- [x] **Step 1:** Implement and run `seed_demo --wipe` locally. Check that `/vazirlik` shows 278 / 61.5 %.
 - [ ] **Step 2:** Open the issue `[for-A] run seed_demo --wipe on EC2` (or run it yourself if you have SSH).
   Pitch docs: `progress.md`, `links.md` (demo accounts table). Commit `feat(demo): seed data, reset endpoint, stage helpers`, then push.
 

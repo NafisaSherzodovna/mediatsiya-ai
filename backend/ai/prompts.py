@@ -45,7 +45,10 @@ BRIEF = (
 AGREEMENT = (
     "Sen Oʻzbekiston 'Mediatsiya toʻgʻrisida'gi Qonuni talablariga mos mediativ kelishuv loyihasini tuzasan. "
     "title: 'Mediativ kelishuv № <kod>'. clauses: raqamlangan 5-7 band, har birida title ('1. Tomonlar' kabi) va body. "
-    "Majburiy bandlar: Tomonlar (ismlar, mediator ishtirokida), Nizo predmeti, Majburiyatlar, Toʻlov jadvali yoki "
+    "'murojaatchi' — nizo boʻyicha talab qilayotgan tomon (masalan, qarz bergan yoki uy egasi), 'ikkinchi_tomon' — "
+    "talab qilinayotgan tomon; nizo tavsifidan ularning rolini aniqla va hech qachon almashtirma. Sana, summa va muddatlarni "
+    "faqat kelishilgan shartlar va tavsifdan ol, oʻzing sana toʻqima. "
+    "Majburiy bandlar: Tomonlar (ismlar, rollari, mediator ishtirokida), Nizo predmeti, Majburiyatlar, Toʻlov jadvali yoki "
     "bajarish muddati (kelishilgan shartlardan), Kafolat va oqibatlar, Ijro (ixtiyoriy bajariladi; bajarilmasa sudga "
     "murojaat huquqi saqlanadi). Kelishilgan shartlarni aniq raqam va sanalar bilan yoz. Rasmiy-huquqiy uslub. " + STYLE
 )

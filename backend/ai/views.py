@@ -183,6 +183,7 @@ def agreement(request):
             "kod": code,
             "murojaatchi": d.get("claimant_name"),
             "ikkinchi_tomon": d.get("respondent_name"),
+            "nizo_tavsifi_murojaatchi_soʻzi_bilan": d.get("summary", ""),
             "turi": fallbacks.LABEL.get(str(d.get("dispute_type")), d.get("dispute_type")),
             "summa_som": d.get("amount_uzs"),
             "malumotnoma": d.get("brief"),

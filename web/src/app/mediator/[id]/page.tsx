@@ -73,6 +73,7 @@ function Workspace({ id }: { id: string }) {
       const a = await api<Agreement>("/ai/agreement/", {
         body: {
           code: c.code,
+          summary: c.description,
           claimant_name: c.claimant.name,
           respondent_name: c.respondent.name,
           dispute_type: c.dispute_type,
