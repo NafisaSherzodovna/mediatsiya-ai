@@ -1,0 +1,21 @@
+# Based on the systemd example in gunicorn's docs (docs/content/deploy.md), bound to TCP instead of a socket.
+[Unit]
+Description=Mediatsiya AI backend (gunicorn)
+After=network.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/srv/mediatsiya/backend
+EnvironmentFile=/etc/mediatsiya.env
+ExecStart=/srv/mediatsiya/backend/.venv/bin/gunicorn config.wsgi -b 0.0.0.0:8000 -w 3 --threads 4 --timeout 30
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
