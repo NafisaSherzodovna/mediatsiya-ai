@@ -146,16 +146,19 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
   - security group: 22 from your IP only, 8000 from `0.0.0.0/0`;
   - attach an Elastic IP;
   - set a billing budget alert at $20.
-- [ ] **Step 2:** `deploy/setup.sh` installs `python3.12-venv git ffmpeg`, clones the repo to `/srv/mediatsiya`,
+- [x] **Step 2:** `deploy/setup.sh` installs `python3.12-venv git ffmpeg`, clones the repo to `/srv/mediatsiya`,
   creates `.venv`, installs requirements and writes `/etc/mediatsiya.env` from prompts (never from git).
   Gemini keys come from the team privately.
-- [ ] **Step 3:** The systemd unit runs
+- [x] **Step 3:** The systemd unit runs
   `gunicorn config.wsgi -b 0.0.0.0:8000 -w 3 --threads 4 --timeout 30` in `/srv/mediatsiya/backend` with
   `EnvironmentFile=/etc/mediatsiya.env`. `deploy.sh` runs `git pull`, `pip install -r`, `migrate`,
   `collectstatic --noinput` and `systemctl restart mediatsiya`.
 - [ ] **Step 4:** Verify from your laptop: `curl http://<IP>:8000/api/health` → `{"ok": true, "ai": true}`.
 - [ ] **Step 5:** Open the issue for B. Pitch docs: `progress.md` line ("Backend AWS'da (Frankfurt) ishlayapti").
 - [ ] **Step 6:** Commit `feat(deploy): ec2 setup, systemd unit and deploy script`, then push.
+- Note: `apt-get` swallows piped stdin, so `setup.sh` asks for secrets before installing (tested end to end in an `ubuntu:24.04` container).
+- Note: gunicorn's own systemd example uses `Type=notify` + `KillMode=mixed`; works without socket activation (tested with `systemd-run`).
+- Note: attached Elastic IPs are billed too ($0.005/h); t3.small ≈ $0.021/h (taxminiy) → ≈ $19/month, so the $20 budget alert is close: stop the instance after the demo.
 
 ### A5: Hardening that the demo touches (P1)
 
