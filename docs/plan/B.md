@@ -311,12 +311,12 @@ Order when time is short:
 **Files:**
 - Create: `web/src/app/vazirlik/page.tsx`, `web/src/components/ministry/{kpi-tiles,monthly-chart,by-type-bars,by-region-bars}.tsx`.
 
-- [ ] **Step 1:** Load the dataviz skill first. From `GET /stats/`:
+- [x] **Step 1:** Load the dataviz skill first. From `GET /stats/`:
   - KPI tiles with NumberFlow: total cases, agreed + rate, average days, refunded fees in soʻm, active mediators;
   - a monthly line (cases vs agreed);
   - horizontal bars by type and by region (14 regions, sorted);
   - a note "Demo maʼlumotlar" and a "Maʼlumotlar shaxsiylashtirilmagan" chip.
-- [ ] **Step 2:** Screenshots. Pitch docs: `progress.md`, FT-10 → `Tayyor`. Commit `feat(web): ministry dashboard`, then push.
+- [x] **Step 2:** Screenshots. Pitch docs: `progress.md`, FT-10 → `Tayyor`. Commit `feat(web): ministry dashboard`, then push.
 
 ### B13: Live wiring — Netlify proxy to EC2 (P0, needs A4's issue `[for-B] backend URL`)
 

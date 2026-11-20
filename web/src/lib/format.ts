@@ -53,7 +53,9 @@ export function dateUz(iso: string, withTime = true): string {
 
 export function monthUz(yyyyMm: string): string {
   const m = Number(yyyyMm.slice(5, 7));
-  return MONTHS[m - 1]?.slice(0, 3) ?? yyyyMm;
+  const name = MONTHS[m - 1];
+  if (!name) return yyyyMm;
+  return name.startsWith("iyu") ? name : name.slice(0, 3); // iyun / iyul stay distinct
 }
 
 export function percent(x: number, digits = 1): string {

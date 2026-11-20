@@ -41,7 +41,7 @@ Uzoq muddatli maqsad: Oʻzbekistonda suddan tashqari hal qilinadigan nizolar ulu
 | FT-7 | Mediator bilan sessiya vaqtini bron qilish | Tayyor |
 | FT-8 | Ishning holati: Yangi, Taklif yuborildi, Rozi, Sessiya, Kelishuv, Yopildi | Tayyor |
 | FT-9 | Kelishuv loyihasini tahrirlash va PDF qilib yuklab olish | Tayyor |
-| FT-10 | Vazirlik paneli: nizo turlari, hududlar, kelishuv foizi | Ha (demo ma'lumot) |
+| FT-10 | Vazirlik paneli: nizo turlari, hududlar, kelishuv foizi | Tayyor (demo ma'lumot) |
 | FT-11 | Platformaning o'zida onlayn video sessiya | Keyin |
 | FT-12 | Ikkala tomonning elektron imzosi bilan tasdiqlash | Keyin |
 | FT-13 | Click yoki Payme orqali to'lov va komissiyani avtomatik ushlab qolish | Keyin |
