@@ -238,7 +238,7 @@ Order when time is short:
 **Files:**
 - Create: `web/src/app/taklif/[token]/page.tsx`, `web/src/components/respondent/*`.
 
-- [ ] **Step 1:**
+- [x] **Step 1:**
   - `GET /invite/{token}/` → a calm letter-style card with the invite text and "Mediatsiya nima?" (3 lines,
     expandable).
   - Two buttons: "Rozi boʻlish" and "Rad etish".
@@ -249,7 +249,7 @@ Order when time is short:
   - Then `POST /ai/position/` → `POST /invite/{token}/respond/ {accept:true, position}` → thank-you screen
     with the next steps.
   - A wrong token → friendly 404 "Taklif topilmadi yoki muddati oʻtgan".
-- [ ] **Step 2:** Screenshot at 390 px (the second phone on stage). Pitch docs: `progress.md`, `shots/B8.png`.
+- [x] **Step 2:** Screenshot at 390 px (the second phone on stage). Pitch docs: `progress.md`, `shots/B8.png`.
   Commit `feat(web): respondent invite page`, then push.
 
 ### B9: AI position, brief and agreement (P0, Python)

@@ -10,3 +10,4 @@ Taqdimot shu jadval va `shots/` papkasidagi skrinshotlar asosida tayyorlanadi.
 | 2026-11-20 | B5 | Landing: "koʻprik" animatsiyasi (ikki tomon → AI umumiy nuqta → muhr), sud/mediatsiya taqqoslash, manbali raqamlar, QR; kirish sahifasi demo hisoblar bilan | shots/B5-1440.png |
 | 2026-11-20 | B6+B7 | Murojaat ustasi: matn/ovoz → AI tasnif (ishonch halqasi) → sud va mediatsiya taqqoslash (tejash: ~166 kun, ~850 ming soʻm) → ikkinchi tomon → AI taklif xati → yuborildi (QR, Telegram, havola) | shots/B6-4-taqqoslash-1440.png, shots/B7-2-taklif-1440.png |
 | 2026-11-20 | A1 | Backend skeleti ishga tushdi: Django + DRF, `/api/health` javob beradi, admin stillari Netlify proksi orqali ishlaydi | - |
+| 2026-11-20 | B8 | Ikkinchi tomon sahifasi (telefon, hisobsiz): xat koʻrinishidagi taklif → "Mediatsiya nima?" → 3 savol → AI pozitsiya → "koʻprik" animatsiyasi; notoʻgʻri havola uchun 404 | shots/B8-1-xat-390.png, shots/B8-3-rozi-390.png |
