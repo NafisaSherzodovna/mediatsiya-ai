@@ -113,12 +113,13 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
   - `monthly` = last 11 months by `created_at`.
   - Ministry and admin only, otherwise 403.
 
-- [ ] **Step 1:** Write `backend/cases/tests.py` with exactly these 3 tests:
-  - `test_invite_public_get_and_respond`: create a case with `invite_text` → `GET /api/invite/<token>/` is
-    200 without auth and has `claimant_name`; then `POST .../respond/ {"accept": true, "position": null}`
-    → `{"status": "accepted"}` and the case has an `accepted` event.
-  - `test_invite_bad_token_404`: `GET /api/invite/nope/` → 404 with a `detail` field.
-  - `test_claimant_sees_only_own_cases`: two claimants with one case each → each sees 1 case.
+- [ ] **Step 1:** Write `backend/cases/tests.py` with exactly **one** test, `test_invite_flow`:
+  - create a case with `invite_text`;
+  - `GET /api/invite/<token>/` is 200 without auth and contains `claimant_name`;
+  - `POST .../respond/ {"accept": true, "position": null}` returns `{"status": "accepted"}`;
+  - `GET /api/invite/nope/` returns 404.
+
+  This is the respondent's phone flow, the riskiest part. Check everything else by hand with `curl`.
 - [ ] **Step 2:** Implement serializers, views and urls until `python manage.py test cases` passes.
 - [ ] **Step 3:** Contract check: `curl` the login, cases, mediators and stats endpoints and compare the key sets
   with `contract/fixtures/*.json` by eye.

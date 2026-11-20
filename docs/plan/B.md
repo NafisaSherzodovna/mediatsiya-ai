@@ -138,12 +138,13 @@ Order when time is short:
   "taxminiy" in the UI.
 - `fallbacks.invite(...)` is a template; the fixture text is a good example.
 
-- [ ] **Step 1:** Write `backend/ai/tests.py` with exactly these 4 tests (each sets `settings.GEMINI_API_KEYS=""` so the fallback runs):
-  - `test_classify_fallback_ijara`: text "Ijarachim 3 oydan beri toʻlamayapti, qarzi 9 million soʻm" →
-    200, `dispute_type=="ijara"`, `mediable is True`, `amount_uzs==9000000`, `source=="fallback"`.
+- [ ] **Step 1:** Write `backend/ai/tests.py` with exactly **two** tests. Both set `settings.GEMINI_API_KEYS=""` so
+  the fallback runs; these are the stage failures that would hurt most.
+  - `test_classify_fallback_cyrillic`: text "Ижарачим 3 ойдан бери тўламаяпти, қарзи 9 миллион" → 200,
+    `dispute_type=="ijara"`, `mediable is True`, `amount_uzs==9000000`, `source=="fallback"`.
   - `test_classify_criminal_not_mediable`: "Qoʻshnim meni urdi va telefonimni oʻgʻirladi" → `mediable is False`.
-  - `test_classify_cyrillic`: "Ижарачим 3 ойдан бери тўламаяпти, қарзи 9 миллион" → `dispute_type=="ijara"`.
-  - `test_classify_short_text_400`: "salom" → 400 with `detail=="Nizoni batafsilroq yozing"`.
+
+  Check the short-text 400 and the Latin input by hand with `curl`.
 - [ ] **Step 2:** Implement until `python manage.py test ai` passes. Then hit each endpoint once with a real key
   and check the Uzbek quality by reading it.
 - [ ] **Step 3:** Pitch docs: `progress.md`, `research.md` (cost numbers + sources), `02` doc AI-1, AI-3, AI-4 → `Tayyor`.

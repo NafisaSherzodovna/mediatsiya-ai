@@ -33,10 +33,17 @@ sees live statistics.
   `oʻ gʻ`, tutuq `ʼ` (U+02BC). Never use an apostrophe `'` or a backtick. Example: "Murojaat qilish",
   "Mediator tanlash", "Kelishuv", "Toʻlov". The user may still switch to the new alphabet
   (Ö Ğ Ş Ç); if so, only `web/src/lib/labels.ts`, the UI copy and the seed text change.
-- **Tests: minimal.** The user ruled that speed comes first. The only tests are:
-  - backend: `python manage.py check` plus the few tests named in the role files;
-  - frontend: `npm run check` (`tsc --noEmit` + `eslint`).
-  - `npm run build` runs only before a deploy and before the freeze. Write no other tests.
+- **Tests: minimal.** The user ruled that speed comes first. The whole test suite is three backend tests:
+  `cases.test_invite_flow` (A3), and `ai.test_classify_fallback_cyrillic` and
+  `ai.test_classify_criminal_not_mediable` (B3).
+  - Before each push, run only the cheap check: A runs `python manage.py check`; B runs `npm run check`
+    (`tsc --noEmit` + `eslint`).
+  - `npm run build` runs only before a deploy and before the freeze.
+  - Write no other tests. Verify by hand (`curl`, one screenshot) instead.
+- **Push after every task.** As soon as a task's last step is done, run `node scripts/sync.mjs <ROLE>`,
+  the cheap check, then `git push origin HEAD:main`. Never sit on finished work. A long task can be pushed
+  mid-way as long as it doesn't break the build.
+- **Research: thorough, but time-boxed.** See "Research protocol" below.
 - **Secrets:**
   - Gemini keys (`GEMINI_API_KEYS`, comma-separated), `DJANGO_SECRET_KEY`, `DEMO_RESET_KEY` and AWS keys
     never go into git. The repo is **public**.
@@ -54,6 +61,42 @@ sees live statistics.
   - Push straight to `main` after `node scripts/sync.mjs <ROLE>`. Never force-push.
 - **Laptop limits:** about 2 GB of free RAM. Never run two `next build`s at once. Check the UI with a
   production build (`npm run build && npm run start`) if the dev server falls into a reload loop.
+
+## Research protocol (both roles)
+
+Good research wins the judges' questions. Bad research burns the clock. Rules:
+
+1. **Before** coding anything that depends on a fact (law text, a fee, a deadline, a statistic) or on an API
+   you are unsure of (Next.js 16, Django 5.2/DRF, Gemini REST, Netlify proxying, MediaRecorder), research
+   it first.
+2. **Primary sources first:**
+   - law and figures: lex.uz, gov.uz/adliya, sud.uz, stat.uz;
+   - libraries: official docs, plus the Next.js docs bundled in `web/node_modules/next/dist/docs/`;
+   - Gemini: ai.google.dev.
+   Use news sites (kun.uz, gazeta.uz, uza.uz) for recent numbers only, and name the outlet.
+3. **Open the page.** A search snippet is not a source. Run several searches in parallel in one turn; use
+   extended search for niche or recent facts.
+4. **Time box:** 10–15 minutes per question. Not settled by then: write it as an open question in
+   `docs/pitch/research.md`, use a value labelled "taxminiy", and move on.
+5. **Record:** every number a judge will see goes into `docs/pitch/research.md` as
+   `| fact | value | source URL | date checked |`. Every library decision that surprised you gets one line
+   in your role file under the task.
+
+Research topics already assigned:
+- **A:**
+  - DRF token auth on Django 5.2;
+  - gunicorn + systemd on Ubuntu 24.04;
+  - whitenoise for admin static files;
+  - a cheap and safe EC2 setup (Elastic IP, security group, budget alert).
+- **B:**
+  - Law OʻRQ-482 articles (for the corpus and citations);
+  - state duty for property claims and the court's time limits in civil cases (Civil Procedure Code);
+  - mediator fee market in Uzbekistan;
+  - the mediation statistics already in `research.md`;
+  - analogues for the pitch's "kim bor" slide: online dispute resolution in Kazakhstan, Russia,
+    Singapore SIMC, India (Sama, Presolv360), EU ODR;
+  - Gemini `responseJsonSchema` and audio input formats;
+  - Netlify proxy rules with Next.js 16.
 
 ## Review focus
 

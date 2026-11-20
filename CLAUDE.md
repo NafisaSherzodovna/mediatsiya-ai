@@ -24,14 +24,16 @@ The demo UI must be excellent. Speed beats polished internals.
   keep going, and open a `[for-A]` or `[for-B]` issue.
 - **Contract:** `contract/api.md` + `contract/fixtures/` are shared. Additive changes only, in a separate
   `[contract]` commit that also updates the fixture.
-- **Tests:** only the ones named in the role files (user decision: speed first). Never block on extra tests.
+- **Tests:** only the three named in the overview (user decision: speed first). Never write extra tests.
+  Verify by hand with `curl` or one screenshot.
+- **Push after every task:** sync, run the cheap check, push at once. Never batch finished tasks.
+- **Research:** follow the overview's "Research protocol": primary sources, open the page, 10–15 minutes per
+  question, record in `docs/pitch/research.md`.
 - **Pitch docs:** after every task, update `docs/pitch/progress.md` (and the requirement status in
   `docs/pitch/02-platforma-talablar.md`) in the same commit. This is part of "done".
 - **UI work:** use `.claude/skills/` (frontend-design, impeccable, motion-framer, ui-toolkit) and the `shadcn`
   and `playwright` MCP servers. Follow `DESIGN.md`. Screenshot at 390 px and 1440 px with this laptop's Chrome
   before ticking a UI task.
-- **Research:** search the web freely for law text, fees and statistics. Put every number shown to judges into
-  `docs/pitch/research.md` with its source URL.
 
 ## Git (everyone pushes to `main`, no PRs)
 
