@@ -7,6 +7,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AiThinking } from "@/components/brand/ai-thinking";
 import { Avatar } from "@/components/brand/bits";
+import { GuillocheRosette } from "@/components/brand/backdrop";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { api, ApiError, errorText } from "@/lib/api";
@@ -258,6 +259,7 @@ function Accepted({ claimant }: { claimant: string }) {
   return (
     <div className="text-center">
       <div className="relative mx-auto mt-6 flex h-28 max-w-sm items-center justify-center">
+        <GuillocheRosette className="absolute top-1/2 left-1/2 size-[300px] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,black_50%,transparent)]" />
         <motion.div initial={{ x: -110, opacity: 0 }} animate={{ x: -34, opacity: 1 }} transition={{ duration: 0.9, ease }} className="absolute">
           <Avatar name={claimant} className="size-16 text-base ring-4 ring-paper" />
         </motion.div>

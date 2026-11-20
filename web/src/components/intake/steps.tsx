@@ -19,6 +19,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { AiSourceChip } from "@/components/brand/bits";
+import { GuillocheRosette } from "@/components/brand/backdrop";
 import { Seal } from "@/components/brand/seal";
 import { CompareBars } from "@/components/case/compare-bars";
 import { Button } from "@/components/ui/button";
@@ -427,7 +428,8 @@ export function SentStep({ item, link }: { item: Case; link: string }) {
   const tg = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(item.invite_text)}`;
   return (
     <div className="text-center">
-      <div className="flex justify-center">
+      <div className="relative flex justify-center">
+        <GuillocheRosette className="absolute top-1/2 left-1/2 -z-10 size-[340px] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,black_55%,transparent)]" />
         <Seal label="YUBORILDI" sub={item.code} className="size-32" />
       </div>
       <h1 className="mt-4 text-[1.9rem] font-semibold text-ink">Taklif tayyor</h1>

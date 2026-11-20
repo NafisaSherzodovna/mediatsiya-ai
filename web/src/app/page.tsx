@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Eyebrow } from "@/components/brand/bits";
 import { Logo } from "@/components/brand/logo";
 import { CompareBars } from "@/components/case/compare-bars";
+import { GirihPattern, GuillocheRosette } from "@/components/brand/backdrop";
 import { HeroBridge } from "@/components/landing/hero-bridge";
 import { Button } from "@/components/ui/button";
 import compareFx from "@/fixtures/compare.json";
@@ -162,7 +163,8 @@ export default function Landing() {
             </li>
           </motion.ul>
         </div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15, ease }}>
+        <motion.div className="relative" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15, ease }}>
+          <GuillocheRosette className="absolute top-1/2 left-1/2 -z-10 size-[620px] -translate-x-1/2 -translate-y-1/2 opacity-80 [mask-image:radial-gradient(closest-side,black_60%,transparent)] sm:size-[760px]" />
           <HeroBridge />
         </motion.div>
       </section>
@@ -213,7 +215,9 @@ export default function Landing() {
       </section>
 
       {/* Numbers */}
-      <section id="raqamlar" className="scroll-mt-20 bg-ink text-white">
+      <section id="raqamlar" className="relative isolate scroll-mt-20 overflow-hidden bg-ink text-white">
+        <GirihPattern className="absolute inset-0 -z-10 h-full w-full" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(900px_400px_at_80%_0%,rgb(13_148_136/0.22),transparent_70%)]" />
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:py-20">
           <p className="text-xs font-semibold tracking-[0.14em] text-[#7fd1c7] uppercase">Raqamlar</p>
           <h2 className="mt-3 max-w-3xl text-3xl font-semibold sm:text-4xl">Mediatsiya oʻsmoqda — lekin uni hali koʻpchilik bilmaydi</h2>

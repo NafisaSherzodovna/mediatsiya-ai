@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { cn } from "cn";
 import { AiThinking } from "@/components/brand/ai-thinking";
 import { AiSourceChip } from "@/components/brand/bits";
+import { GuillocheRosette } from "@/components/brand/backdrop";
 import { Seal } from "@/components/brand/seal";
 import { BriefCard } from "@/components/case/agreement";
 import { CaseHeader, PositionCard, Timeline } from "@/components/case/parts";
@@ -248,8 +249,9 @@ function Workspace({ id }: { id: string }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="relative overflow-hidden rounded-2xl border border-accord/30 bg-[radial-gradient(600px_220px_at_50%_0%,var(--accord-tint),#fff)] p-6 text-center"
               >
-                <div className="flex justify-center">
-                  <Seal stamped={stage === "sealing"} sub={c.code} className="size-36" delay={0.15} />
+                <div className="relative flex justify-center">
+                  <GuillocheRosette className="absolute top-1/2 left-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 opacity-90 [mask-image:radial-gradient(closest-side,black_55%,transparent)]" />
+                  <Seal stamped={stage === "sealing"} sub={c.code} className="relative size-36" delay={0.15} />
                 </div>
                 <h2 className="mt-3 text-2xl font-semibold text-ink">Kelishuvga erishildi</h2>
                 <p className="mx-auto mt-1 max-w-md text-ink-soft">Kelishuv saqlandi. Tomonlar uni PDF koʻrinishida olishi mumkin.</p>

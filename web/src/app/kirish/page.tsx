@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { cn } from "cn";
+import { GuillocheRosette } from "@/components/brand/backdrop";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,7 +125,8 @@ function LoginForm() {
 
 export default function KirishPage() {
   return (
-    <main className="flex flex-1 flex-col items-center px-4 py-8 sm:py-14">
+    <main className="relative isolate flex flex-1 flex-col items-center overflow-x-clip px-4 py-8 sm:py-14">
+      <GuillocheRosette className="absolute top-40 left-1/2 -z-10 size-[900px] -translate-x-1/2 opacity-60 [mask-image:radial-gradient(closest-side,black_45%,transparent)]" />
       <Link href="/" className="mb-8">
         <Logo />
       </Link>

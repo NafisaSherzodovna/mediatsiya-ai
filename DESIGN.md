@@ -56,6 +56,20 @@ Light theme only. All text meets AA contrast.
   glow. No confetti; this is a legal moment, so keep it dignified.
 - `prefers-reduced-motion`: jump to the end states.
 
+## Backgrounds
+
+Calm, fine-line textures only (research 2026-11-20: trust-centred legal sites avoid loud motion and favour light
+texture and fine lines). Both are generated as SVG in `web/src/components/brand/backdrop.tsx`, so no image files:
+
+- **Guilloche** (`GuillocheWaves`, `GuillocheRosette`) is the engraved line work of certificates and official
+  documents, and it says "a real, trustworthy document".
+  - A faint wave band sits at the top of every page (root layout).
+  - A slow rosette (240 s per turn, off under reduced motion) sits behind the hero bridge, the login card and every
+    seal moment: invite sent, agreement sealed, respondent accepted.
+- **Girih** (`GirihPattern`) is the Uzbek 8-point star lattice ("dilduz"), drawn at 9 % white on the dark numbers
+  section for local identity.
+- Opacity stays low, and content never sits on a busy area without a sheet under it.
+
 ## Don't
 
 - No purple or blue gradients, glassmorphism, blob backgrounds, Inter or Roboto, or emoji as icons (use lucide).
