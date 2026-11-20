@@ -108,6 +108,44 @@ answer with `source: "fallback"`. It never returns 5xx for a model failure.
 | `POST /api/ai/agreement/` | `{ code, claimant_name, respondent_name, dispute_type, amount_uzs, brief, terms: string[], summary?: string }` → `Agreement` (`summary` = the claimant's own description, so the model keeps the roles right) |
 | `POST /api/ai/ask/` | `{ question }` → `{ answer, citations: Citation[], source }` |
 
+## Rooms (owner: B, app `backend/rooms/`): chat, meetings, agreement approval
+
+A room exists once a mediator is booked. The mediator has a **separate private chat with each party**, proposes
+**meetings per party**, and the two parties **approve the agreement draft** before the mediator can seal it.
+- The mediator and the claimant use their token. The respondent uses the invite token, with no account (`/api/rooms/t/{token}/…`).
+- A party sees only its own chat and its own meetings.
+
+```ts
+type RoomParty = "claimant" | "respondent";
+type RoomMessage = { id: number; party: RoomParty; sender: "mediator" | RoomParty; text: string; at: string };
+type Meeting = { id: string; party: RoomParty; start: string; minutes: number; mode: "online" | "ofis"; place: string; note: string;
+  status: "proposed" | "accepted" | "declined" | "cancelled" };
+type ApprovalState = { decision: "approved" | "changes"; comment: string; at: string; current: boolean } | null;
+type Room = { case_id: string; code: string; status: CaseStatus; viewer: "mediator" | RoomParty;
+  mediator: { name: string; registry_no: string } | null; names: Record<RoomParty, string>;
+  threads: { party: RoomParty; name: string; unread: number; last: RoomMessage | null }[];
+  meetings: Meeting[]; agreement: Agreement | null; agreement_hash: string;
+  approvals: Record<RoomParty, ApprovalState> };
+```
+
+| Method and path | Who | Request → response |
+|---|---|---|
+| `GET /api/rooms/{case_id}/` | mediator, claimant | → `Room` |
+| `GET /api/rooms/{case_id}/messages/?party=` | mediator (any party), claimant (own) | → `RoomMessage[]` (marks them read) |
+| `POST /api/rooms/{case_id}/messages/` | same | `{ text, party? }` → `RoomMessage` |
+| `POST /api/rooms/{case_id}/meetings/` | mediator | `{ party, start, minutes (15–180), mode, place, note }` → `Meeting` (`proposed`). 409 when it overlaps any live meeting of this mediator: `{detail:"Bu vaqtda … bilan uchrashuv bor …"}` |
+| `POST /api/rooms/meetings/{id}/` | claimant: `{status:"accepted"\|"declined"}`; mediator: `{status:"cancelled"}` | → `Meeting` |
+| `POST /api/rooms/{case_id}/approve/` | claimant | `{ decision: "approved"\|"changes", comment? }` → `{ approvals }` |
+| `GET /api/rooms/t/{token}/` | respondent | → `Room` |
+| `GET\|POST /api/rooms/t/{token}/messages/` | respondent | as above |
+| `POST /api/rooms/t/{token}/meetings/{id}/` | respondent | `{status}` → `Meeting` |
+| `POST /api/rooms/t/{token}/approve/` | respondent | `{decision, comment?}` → `{approvals}` |
+
+Rules:
+- A meeting counts only once the party accepts it.
+- An approval is `current:false` after the agreement text changes.
+- `PATCH /api/cases/{id}/ {status:"agreed"}` returns 400 `{detail:"Ikkala tomon kelishuv loyihasini tasdiqlamagan"}` unless both parties approved the current text.
+
 ## Demo endpoint (owner: B, app `backend/demo/`)
 
 | Method and path | Auth | Request → response |
