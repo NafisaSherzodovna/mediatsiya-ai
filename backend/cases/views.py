@@ -67,13 +67,23 @@ def pick(data, fields):
     return {k: data[k] for k in fields if k in data}
 
 
+def invalid(ser):
+    """The web client shows only `detail`, so flatten DRF field errors into it (None when valid)."""
+    if ser.is_valid():
+        return None
+    return Response({"detail": "Notoʻgʻri maʼlumot: " + ", ".join(ser.errors)}, status=400)
+
+
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def case_list(request):
     if request.method == "GET":
         return Response(CaseSerializer(visible_cases(request.user)[:50], many=True).data)
+    if len(str(request.data.get("description") or "").strip()) < 20:
+        return Response({"detail": "Nizoni batafsilroq yozing"}, status=400)
     ser = CaseSerializer(data=pick(request.data, CREATE_FIELDS))
-    ser.is_valid(raise_exception=True)
+    if error := invalid(ser):
+        return error
     invited = bool(ser.validated_data.get("invite_text", "").strip())
     with transaction.atomic():
         case = ser.save(
@@ -91,7 +101,8 @@ def case_detail(request, pk):
     case = get_object_or_404(visible_cases(request.user), pk=pk)
     if request.method == "PATCH":
         ser = CaseSerializer(case, data=pick(request.data, PATCH_FIELDS), partial=True)
-        ser.is_valid(raise_exception=True)
+        if error := invalid(ser):
+            return error
         status = ser.validated_data.pop("status", None)
         with transaction.atomic():
             ser.save()
@@ -111,7 +122,8 @@ class BookSerializer(serializers.Serializer):
 def case_book(request, pk):
     case = get_object_or_404(visible_cases(request.user), pk=pk)
     ser = BookSerializer(data=request.data)
-    ser.is_valid(raise_exception=True)
+    if error := invalid(ser):
+        return error
     case.mediator = get_object_or_404(Mediator, pk=ser.validated_data["mediator_id"])
     case.session_at = ser.validated_data["session_at"]
     with transaction.atomic():
@@ -152,7 +164,8 @@ class RespondSerializer(serializers.Serializer):
 def invite_respond(request, token):
     case = invite_case(token)
     ser = RespondSerializer(data=request.data)
-    ser.is_valid(raise_exception=True)
+    if error := invalid(ser):
+        return error
     # Once a mediator is booked, a late tap on the old link must not roll the case back.
     if case.status in (CaseStatus.NEW, CaseStatus.INVITED, CaseStatus.ACCEPTED, CaseStatus.DECLINED):
         with transaction.atomic():

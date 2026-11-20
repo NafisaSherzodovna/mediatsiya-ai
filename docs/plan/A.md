@@ -162,12 +162,14 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
 
 ### A5: Hardening that the demo touches (P1)
 
-- [ ] **Step 1:** In `POST /api/cases/` reject `description` shorter than 20 chars with
+- [x] **Step 1:** In `POST /api/cases/` reject `description` shorter than 20 chars with
   400 `{detail:"Nizoni batafsilroq yozing"}`; reject an unknown `dispute_type` or `region` with 400.
-- [ ] **Step 2:** Apply `ScopedRateThrottle` with scope `ai` to the AI views by default
+- [x] **Step 2:** Apply `ScopedRateThrottle` with scope `ai` to the AI views by default
   (B's views set `throttle_scope = "ai"`; you only configure it).
 - [ ] **Step 3:** Run `deploy.sh` on EC2 after every push that touches `backend/` (B pings you in issues).
-- [ ] **Step 4:** Pitch docs: `progress.md` line. Commit `fix(api): input validation and ai throttle`, then push.
+- [x] **Step 4:** Pitch docs: `progress.md` line. Commit `fix(api): input validation and ai throttle`, then push.
+- Note: the web client shows only `detail`, so DRF field errors are flattened to `{detail:"Notoʻgʻri maʼlumot: <fields>"}`.
+- Note: throttle counts live in the default LocMem cache, one per gunicorn worker, so with `-w 3` the real AI limit is up to 90/min (verified 429 after 30 under runserver).
 
 **When you are done or blocked:** handle `[for-A]` issues first, then help B on request (the user decides).
 Never edit B's paths without the user asking.
