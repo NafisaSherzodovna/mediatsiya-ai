@@ -187,9 +187,9 @@ Order when time is short:
   After login go to `?next` or `ROLE_HOME[role]`.
 - `AppHeader`: logo, role-specific nav, user name, "Chiqish".
 
-- [ ] **Step 1:** Build it in mock mode and take screenshots at 390 and 1440 px. Use the motion entrance
+- [x] **Step 1:** Build it in mock mode and take screenshots at 390 and 1440 px. Use the motion entrance
   stagger, NumberFlow on the numbers, and no layout shift.
-- [ ] **Step 2:** `npm run check`. Pitch docs: `progress.md`, `shots/B5.png`. Commit `feat(web): landing, login, shell`, then push.
+- [x] **Step 2:** `npm run check`. Pitch docs: `progress.md`, `shots/B5.png`. Commit `feat(web): landing, login, shell`, then push.
 
 ### B6: Intake — describe, classify, compare (P0)
 
