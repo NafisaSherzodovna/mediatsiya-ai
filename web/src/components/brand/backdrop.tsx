@@ -85,7 +85,7 @@ export function GuillocheWaves({ className }: { className?: string }) {
  * Girih lattice: an 8-point star (two squares at 45°) per tile, joined to its neighbours,
  * the classic Central Asian "dilduz" grid. `tone` sets the line colour.
  */
-export function GirihPattern({ className, tone = "light", id = "girih" }: { className?: string; tone?: "light" | "dark"; id?: string }) {
+export function GirihPattern({ className, tone = "light", id = "girih" }: { className?: string; tone?: "light" | "dark" | "teal"; id?: string }) {
   const s = 72; // tile
   const c = s / 2;
   const r = 15; // star radius
@@ -94,7 +94,7 @@ export function GirihPattern({ className, tone = "light", id = "girih" }: { clas
       const a = ((i * 90 + rot) * Math.PI) / 180;
       return `${round(c + r * Math.cos(a))},${round(c + r * Math.sin(a))}`;
     }).join(" ");
-  const stroke = tone === "light" ? "rgb(255 255 255 / 0.09)" : "rgb(27 42 74 / 0.07)";
+  const stroke = tone === "light" ? "rgb(255 255 255 / 0.09)" : tone === "teal" ? "rgb(13 148 136 / 0.2)" : "rgb(27 42 74 / 0.07)";
   return (
     <svg className={cn("pointer-events-none select-none", className)} aria-hidden>
       <defs>
