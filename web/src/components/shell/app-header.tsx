@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { cn } from "cn";
-import { AtlasRule } from "@/components/brand/atlas";
 import { Logo } from "@/components/brand/logo";
 import { Avatar } from "@/components/brand/bits";
 import { Button } from "@/components/ui/button";
@@ -33,7 +32,7 @@ export function AppHeader() {
   const router = useRouter();
   const nav = user ? NAV[user.role] : [];
   return (
-    <header className="no-print sticky top-0 z-30 bg-paper/85 backdrop-blur-md">
+    <header className="no-print sticky top-0 z-30 border-b border-rule/70 bg-paper/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4">
         <Link href="/" aria-label="Bosh sahifa">
           <Logo />
@@ -97,7 +96,6 @@ export function AppHeader() {
           ))}
         </nav>
       )}
-      <AtlasRule className="absolute inset-x-0 -bottom-px opacity-80" />
     </header>
   );
 }

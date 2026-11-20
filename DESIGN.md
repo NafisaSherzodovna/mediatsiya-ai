@@ -4,7 +4,7 @@ Owner: B. B1 turns this into tokens in `web/src/app/globals.css`. Keep this file
 
 ## World
 
-Two sides of a dispute meet in the middle. The metaphor is a **bridge**: the claimant on the left and the
+Two sides of a dispute meet in the middle and come into balance. The metaphors are the **scales of justice** and a **bridge**: the claimant on the left and the
 respondent on the right, with every step drawing them closer. The material is a calm, official **document
 on good paper**: ink, a margin rule, and a round **seal (muhr)** that lands when the agreement is signed.
 The page should feel trustworthy and humane, like a well-run notary's office, never a courtroom and never a
@@ -56,24 +56,20 @@ Light theme only. All text meets AA contrast.
   glow. No confetti; this is a legal moment, so keep it dignified.
 - `prefers-reduced-motion`: jump to the end states.
 
-## Backgrounds
+## Symbol and background
 
-**Default: "Atlas muvozanati" (variant `e`).**
-- **What it is:** Uzbek khan-atlas (abr ikat) bands in Samarkand tile colours run down both page edges and mirror
-  each other like the two pans of a balance. That reads as justice: two equal sides and a clear middle where they
-  meet.
-  - Colours: cobalt `#1f4e9e`, turquoise `#14a3a0`, saffron gold `#e9b543`, pomegranate `#cf4f3c`.
-  - The abr "cloud" edge comes from an SVG turbulence and displacement filter (`components/brand/atlas.tsx`).
-  - The bands fade toward the content and sit over soft teal, blue and apricot glows.
-- **Small screens (< 1024 px):** only thin atlas selvedge stripes stay on the edges, so text never sits on the pattern.
-- **Research (2026-11-20):**
-  - Khan atlas (abr) is Uzbekistan's best-known textile, now used by fashion designers worldwide.
-  - Its blurred "cloud" edges are its defining trait.
-  - Registan tiles are mainly cobalt, turquoise, white and gold.
-  - A balance (scales) is the universal sign of justice.
-- **Other variants**, preview with `?fon=a|b|c|d`: a soft glows, b dot grid, c bridge arcs, d girih lattice. The first
-  try (a guilloche rosette) looked strange to the team and was removed.
-- **Dark numbers section:** keeps the girih (dilduz) lattice at 9 % white.
+- **Symbol: the scales of justice**, made our own: the two parties sit on the two pans, and the fulcrum is the AI.
+  - The hero (`components/landing/hero-scales.tsx`) tells the whole product in one loop:
+    1. the beam tips (the dispute);
+    2. the AI looks for common ground at the fulcrum;
+    3. the beam levels out ("Muvozanat topildi");
+    4. the agreement is sealed.
+  - The logo mark is the same balanced scale on an ink tile.
+  - Reduced motion shows the balanced end state.
+- **Background:** clean paper with one soft teal light from the top and a faint blue one at the bottom. The symbol
+  carries the meaning, so the background stays quiet.
+- **Earlier tries, all removed at the team's request:** guilloche rosette, dot grid, arcs, girih lattice and atlas
+  bands.
 
 ## Don't
 

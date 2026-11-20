@@ -1,118 +1,12 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
-import { Suspense, useSyncExternalStore } from "react";
-import { AtlasBand } from "./atlas";
-import { GirihPattern } from "./backdrop";
-
 /**
- * Page background variants, picked by the team. Preview any of them with `?fon=a|b|c|d`;
- * the choice sticks in localStorage. `DEFAULT` is what everyone sees.
+ * Page background: clean paper with one soft teal light from the top. Calm on purpose: the hero's scales of
+ * justice carry the symbolism, the background only gives warmth.
  */
-export type Fon = "a" | "b" | "c" | "d" | "e";
-const DEFAULT: Fon = "e";
-const ALL = "abcde";
-const SELVEDGE = "repeating-linear-gradient(180deg,#1d4fa8 0 40px,#f0b43c 40px 48px,#12a5a1 48px 88px,#d24a3a 88px 96px,#b0367a 96px 136px,#f0b43c 136px 144px)";
-const KEY = "ma.fon";
-const noop = () => () => {};
-
-function useFon(): Fon {
-  const params = useSearchParams();
-  const q = params.get("fon");
-  const stored = useSyncExternalStore(
-    noop,
-    () => {
-      try {
-        return window.localStorage.getItem(KEY);
-      } catch {
-        return null;
-      }
-    },
-    () => null,
-  );
-  if (q && ALL.includes(q)) {
-    try {
-      window.localStorage.setItem(KEY, q);
-    } catch {
-      /* ignore */
-    }
-    return q as Fon;
-  }
-  return stored && ALL.includes(stored) ? (stored as Fon) : DEFAULT;
-}
-
-/** Soft colour field shared by all variants: teal, stamp blue and a warm apricot. */
-function Glows({ strong = false }: { strong?: boolean }) {
-  const k = strong ? 1 : 0.75;
-  return (
-    <>
-      <div className="absolute -top-48 -left-40 size-[760px] rounded-full blur-2xl" style={{ background: `radial-gradient(closest-side, rgb(13 148 136 / ${0.22 * k}), transparent)` }} />
-      <div className="absolute -top-32 right-[-12%] size-[680px] rounded-full blur-2xl" style={{ background: `radial-gradient(closest-side, rgb(46 79 163 / ${0.2 * k}), transparent)` }} />
-      <div className="absolute top-[38%] left-[42%] size-[620px] rounded-full blur-2xl" style={{ background: `radial-gradient(closest-side, rgb(245 166 120 / ${0.18 * k}), transparent)` }} />
-      <div className="absolute bottom-[-20%] left-[-10%] size-[640px] rounded-full blur-2xl" style={{ background: `radial-gradient(closest-side, rgb(255 214 120 / ${0.16 * k}), transparent)` }} />
-    </>
-  );
-}
-
-function Layer() {
-  const fon = useFon();
-  return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" data-fon={fon}>
-      {/* e: Uzbek khan-atlas bands mirrored like the two pans of a balance (default) */}
-      {fon === "e" && (
-        <>
-          <Glows />
-          <AtlasBand id="atlas-l" className="absolute top-0 left-0 hidden h-full w-[min(11vw,210px)] lg:block" />
-          <AtlasBand id="atlas-r" side="right" className="absolute top-0 right-0 hidden h-full w-[min(11vw,210px)] lg:block" />
-          {/* small screens: the content needs the width, so only thin atlas selvedges remain */}
-          <div className="absolute inset-y-0 left-0 w-1.5 lg:hidden" style={{ background: SELVEDGE }} />
-          <div className="absolute inset-y-0 right-0 w-1.5 lg:hidden" style={{ background: SELVEDGE }} />
-        </>
-      )}
-      {/* a: clean paper with two soft glows */}
-      {fon === "a" && <Glows strong />}
-      {/* b: fine dot grid fading downward */}
-      {fon === "b" && (
-        <>
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: "radial-gradient(rgb(13 148 136 / 0.32) 1.1px, transparent 1.4px)",
-              backgroundSize: "22px 22px",
-              maskImage: "linear-gradient(to bottom, black, transparent 75%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black, transparent 75%)",
-            }}
-          />
-          <Glows />
-        </>
-      )}
-      {/* c: a few wide arcs rising from the bottom — the bridge, very quiet */}
-      {fon === "c" && <Glows />}
-      {fon === "c" && (
-        <svg className="absolute inset-x-0 bottom-0 h-[70vh] w-full" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMax slice">
-          {[260, 420, 580, 740, 900].map((r, i) => (
-            <circle key={r} cx={720} cy={900} r={r} fill="none" stroke={i % 2 ? "var(--seal)" : "#0d9488"} strokeOpacity={0.22} strokeWidth={1.6} />
-          ))}
-        </svg>
-      )}
-      {/* d: Uzbek girih lattice, very faint, fading downward */}
-      {fon === "d" && <Glows />}
-      {fon === "d" && (
-        <div
-          className="absolute inset-0"
-          style={{ maskImage: "linear-gradient(to bottom, black, transparent 80%)", WebkitMaskImage: "linear-gradient(to bottom, black, transparent 80%)" }}
-        >
-          <GirihPattern tone="teal" id="girih-page" className="h-full w-full" />
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function PageBackdrop() {
   return (
-    <Suspense>
-      <Layer />
-    </Suspense>
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div className="absolute -top-[30vh] left-1/2 h-[70vh] w-[110vw] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(15_118_110/0.10),transparent)]" />
+      <div className="absolute right-[-15vw] bottom-[-25vh] h-[60vh] w-[60vw] rounded-[50%] bg-[radial-gradient(closest-side,rgb(46_79_163/0.06),transparent)]" />
+    </div>
   );
 }
