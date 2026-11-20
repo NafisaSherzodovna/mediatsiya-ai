@@ -12,7 +12,7 @@ import { GirihPattern } from "./backdrop";
 export type Fon = "a" | "b" | "c" | "d" | "e";
 const DEFAULT: Fon = "e";
 const ALL = "abcde";
-const SELVEDGE = "repeating-linear-gradient(180deg,#1f4e9e 0 48px,#14a3a0 48px 96px,#e9b543 96px 144px,#cf4f3c 144px 192px)";
+const SELVEDGE = "repeating-linear-gradient(180deg,#1d4fa8 0 40px,#f0b43c 40px 48px,#12a5a1 48px 88px,#d24a3a 88px 96px,#b0367a 96px 136px,#f0b43c 136px 144px)";
 const KEY = "ma.fon";
 const noop = () => () => {};
 
@@ -62,8 +62,8 @@ function Layer() {
       {fon === "e" && (
         <>
           <Glows />
-          <AtlasBand id="atlas-l" className="absolute top-0 left-0 hidden h-full w-[min(12vw,210px)] opacity-90 lg:block" />
-          <AtlasBand id="atlas-r" side="right" className="absolute top-0 right-0 hidden h-full w-[min(12vw,210px)] opacity-90 lg:block" />
+          <AtlasBand id="atlas-l" className="absolute top-0 left-0 hidden h-full w-[min(11vw,210px)] lg:block" />
+          <AtlasBand id="atlas-r" side="right" className="absolute top-0 right-0 hidden h-full w-[min(11vw,210px)] lg:block" />
           {/* small screens: the content needs the width, so only thin atlas selvedges remain */}
           <div className="absolute inset-y-0 left-0 w-1.5 lg:hidden" style={{ background: SELVEDGE }} />
           <div className="absolute inset-y-0 right-0 w-1.5 lg:hidden" style={{ background: SELVEDGE }} />

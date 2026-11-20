@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Eyebrow } from "@/components/brand/bits";
 import { Logo } from "@/components/brand/logo";
 import { CompareBars } from "@/components/case/compare-bars";
+import { AtlasRule } from "@/components/brand/atlas";
 import { GirihPattern } from "@/components/brand/backdrop";
 import { HeroBridge } from "@/components/landing/hero-bridge";
 import { Button } from "@/components/ui/button";
@@ -83,7 +84,8 @@ export default function Landing() {
 
   return (
     <div className="flex flex-1 flex-col overflow-x-clip">
-      <header className="sticky top-0 z-30 border-b border-transparent bg-paper/80 backdrop-blur-md">
+      <header className="sticky top-0 z-30 bg-paper/80 backdrop-blur-md">
+        <AtlasRule className="absolute inset-x-0 -bottom-px opacity-80" />
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4">
           <Logo />
           <nav className="ml-6 hidden gap-1 text-sm font-medium text-ink-soft md:flex">
