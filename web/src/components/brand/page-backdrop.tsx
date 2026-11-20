@@ -2,14 +2,17 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useSyncExternalStore } from "react";
+import { AtlasBand } from "./atlas";
 import { GirihPattern } from "./backdrop";
 
 /**
  * Page background variants, picked by the team. Preview any of them with `?fon=a|b|c|d`;
  * the choice sticks in localStorage. `DEFAULT` is what everyone sees.
  */
-export type Fon = "a" | "b" | "c" | "d";
-const DEFAULT: Fon = "a";
+export type Fon = "a" | "b" | "c" | "d" | "e";
+const DEFAULT: Fon = "e";
+const ALL = "abcde";
+const SELVEDGE = "repeating-linear-gradient(180deg,#1f4e9e 0 48px,#14a3a0 48px 96px,#e9b543 96px 144px,#cf4f3c 144px 192px)";
 const KEY = "ma.fon";
 const noop = () => () => {};
 
@@ -27,7 +30,7 @@ function useFon(): Fon {
     },
     () => null,
   );
-  if (q && "abcd".includes(q)) {
+  if (q && ALL.includes(q)) {
     try {
       window.localStorage.setItem(KEY, q);
     } catch {
@@ -35,7 +38,7 @@ function useFon(): Fon {
     }
     return q as Fon;
   }
-  return stored && "abcd".includes(stored) ? (stored as Fon) : DEFAULT;
+  return stored && ALL.includes(stored) ? (stored as Fon) : DEFAULT;
 }
 
 /** Soft colour field shared by all variants: teal, stamp blue and a warm apricot. */
@@ -55,6 +58,17 @@ function Layer() {
   const fon = useFon();
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" data-fon={fon}>
+      {/* e: Uzbek khan-atlas bands mirrored like the two pans of a balance (default) */}
+      {fon === "e" && (
+        <>
+          <Glows />
+          <AtlasBand id="atlas-l" className="absolute top-0 left-0 hidden h-full w-[min(12vw,210px)] opacity-90 lg:block" />
+          <AtlasBand id="atlas-r" side="right" className="absolute top-0 right-0 hidden h-full w-[min(12vw,210px)] opacity-90 lg:block" />
+          {/* small screens: the content needs the width, so only thin atlas selvedges remain */}
+          <div className="absolute inset-y-0 left-0 w-1.5 lg:hidden" style={{ background: SELVEDGE }} />
+          <div className="absolute inset-y-0 right-0 w-1.5 lg:hidden" style={{ background: SELVEDGE }} />
+        </>
+      )}
       {/* a: clean paper with two soft glows */}
       {fon === "a" && <Glows strong />}
       {/* b: fine dot grid fading downward */}

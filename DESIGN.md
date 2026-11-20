@@ -58,15 +58,22 @@ Light theme only. All text meets AA contrast.
 
 ## Backgrounds
 
-The first try (a guilloche rosette and engraved waves) looked strange to the team and was removed. Four calm
-variants now live in `web/src/components/brand/page-backdrop.tsx`, previewed with `?fon=a|b|c|d`:
-
-- **a:** clean paper with two soft glows (default);
-- **b:** a fine dot grid that fades downward;
-- **c:** a few wide arcs rising from the bottom (the bridge);
-- **d:** a faint Uzbek girih lattice.
-
-The dark numbers section keeps its girih pattern at 9 % white. Set `DEFAULT` to the team's pick.
+**Default: "Atlas muvozanati" (variant `e`).**
+- **What it is:** Uzbek khan-atlas (abr ikat) bands in Samarkand tile colours run down both page edges and mirror
+  each other like the two pans of a balance. That reads as justice: two equal sides and a clear middle where they
+  meet.
+  - Colours: cobalt `#1f4e9e`, turquoise `#14a3a0`, saffron gold `#e9b543`, pomegranate `#cf4f3c`.
+  - The abr "cloud" edge comes from an SVG turbulence and displacement filter (`components/brand/atlas.tsx`).
+  - The bands fade toward the content and sit over soft teal, blue and apricot glows.
+- **Small screens (< 1024 px):** only thin atlas selvedge stripes stay on the edges, so text never sits on the pattern.
+- **Research (2026-11-20):**
+  - Khan atlas (abr) is Uzbekistan's best-known textile, now used by fashion designers worldwide.
+  - Its blurred "cloud" edges are its defining trait.
+  - Registan tiles are mainly cobalt, turquoise, white and gold.
+  - A balance (scales) is the universal sign of justice.
+- **Other variants**, preview with `?fon=a|b|c|d`: a soft glows, b dot grid, c bridge arcs, d girih lattice. The first
+  try (a guilloche rosette) looked strange to the team and was removed.
+- **Dark numbers section:** keeps the girih (dilduz) lattice at 9 % white.
 
 ## Don't
 
