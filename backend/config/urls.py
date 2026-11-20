@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 
 def health(request):
@@ -9,7 +9,7 @@ def health(request):
 
 
 urlpatterns = [
-    path("api/health", health),
+    re_path(r"^api/health/?$", health),
     path("api/auth/", include("accounts.urls")),
     path("api/", include("cases.urls")),
     path("api/", include("mediators.urls")),

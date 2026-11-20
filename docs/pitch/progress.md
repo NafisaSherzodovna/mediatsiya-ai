@@ -12,3 +12,4 @@ Taqdimot shu jadval va `shots/` papkasidagi skrinshotlar asosida tayyorlanadi.
 | 2026-11-20 | A1 | Backend skeleti ishga tushdi: Django + DRF, `/api/health` javob beradi, admin stillari Netlify proksi orqali ishlaydi | - |
 | 2026-11-20 | B8 | Ikkinchi tomon sahifasi (telefon, hisobsiz): xat koʻrinishidagi taklif → "Mediatsiya nima?" → 3 savol → AI pozitsiya → "koʻprik" animatsiyasi; notoʻgʻri havola uchun 404 | shots/B8-1-xat-390.png, shots/B8-3-rozi-390.png |
 | 2026-11-20 | A2 | Operator paneli (Django admin): ishlar va mediatorlar, filtr va qidiruv; 4 demo hisob (ariza, mediator, vazirlik, admin) | - |
+| 2026-11-20 | A3 | REST API kontrakt boʻyicha tayyor: kirish, ishlar (rol boʻyicha koʻrinish), taklif havolasi hisobsiz, mediator bron, vazirlik statistikasi bazadan hisoblanadi | - |

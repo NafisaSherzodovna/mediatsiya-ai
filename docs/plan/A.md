@@ -115,18 +115,21 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
   - `monthly` = last 11 months by `created_at`.
   - Ministry and admin only, otherwise 403.
 
-- [ ] **Step 1:** Write `backend/cases/tests.py` with exactly **one** test, `test_invite_flow`:
+- [x] **Step 1:** Write `backend/cases/tests.py` with exactly **one** test, `test_invite_flow`:
   - create a case with `invite_text`;
   - `GET /api/invite/<token>/` is 200 without auth and contains `claimant_name`;
   - `POST .../respond/ {"accept": true, "position": null}` returns `{"status": "accepted"}`;
   - `GET /api/invite/nope/` returns 404.
 
   This is the respondent's phone flow, the riskiest part. Check everything else by hand with `curl`.
-- [ ] **Step 2:** Implement serializers, views and urls until `python manage.py test cases` passes.
-- [ ] **Step 3:** Contract check: `curl` the login, cases, mediators and stats endpoints and compare the key sets
+- [x] **Step 2:** Implement serializers, views and urls until `python manage.py test cases` passes.
+- [x] **Step 3:** Contract check: `curl` the login, cases, mediators and stats endpoints and compare the key sets
   with `contract/fixtures/*.json` by eye.
-- [ ] **Step 4:** Pitch docs: `progress.md` line ("REST API kontrakt boʻyicha tayyor").
-- [ ] **Step 5:** Commit `feat(api): auth, cases, invite, mediators, stats endpoints`, then push.
+- [x] **Step 4:** Pitch docs: `progress.md` line ("REST API kontrakt boʻyicha tayyor").
+- [x] **Step 5:** Commit `feat(api): auth, cases, invite, mediators, stats endpoints`, then push.
+- Note: SQLite has no JSONField `contains` lookup, so `/api/mediators/` filters specialties/languages in Python.
+- Note: DRF has no `uz` locale, so its own 401 says "Authentication credentials were not provided." in English; our own errors are Uzbek.
+- Note: a leftover mock token (`mock-u-ariza`) would make TokenAuthentication answer 401 even on public views, so login, invite and mediators set `authentication_classes = []`.
 
 ### A4: EC2 deploy (P0)
 
