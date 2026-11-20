@@ -105,7 +105,7 @@ answer with `source: "fallback"`. It never returns 5xx for a model failure.
 | `POST /api/ai/invite/` | `{ claimant_name, respondent_name, dispute_type, amount_uzs, summary }` → `{ text, checks: string[], source }` |
 | `POST /api/ai/position/` | `{ role: "claimant" \| "respondent", summary, answers: { q: string; a: string }[] }` → `Position` |
 | `POST /api/ai/brief/` | `{ summary, dispute_type, amount_uzs, claimant_position, respondent_position }` → `Brief` |
-| `POST /api/ai/agreement/` | `{ code, claimant_name, respondent_name, dispute_type, amount_uzs, brief, terms: string[] }` → `Agreement` |
+| `POST /api/ai/agreement/` | `{ code, claimant_name, respondent_name, dispute_type, amount_uzs, brief, terms: string[], summary?: string }` → `Agreement` (`summary` = the claimant's own description, so the model keeps the roles right) |
 | `POST /api/ai/ask/` | `{ question }` → `{ answer, citations: Citation[], source }` |
 
 ## Demo endpoint (owner: B, app `backend/demo/`)
