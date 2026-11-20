@@ -294,16 +294,16 @@ Order when time is short:
 - Create: `web/src/app/mediator/page.tsx`, `web/src/app/mediator/[id]/page.tsx`, `web/src/app/ishlar/[id]/kelishuv/page.tsx`,
   `web/src/components/case/{brief-card,agreement-editor,agreement-doc,stamp}.tsx`.
 
-- [ ] **Step 1:** `/mediator` lists the assigned cases. `/mediator/[id]`:
+- [x] **Step 1:** `/mediator` lists the assigned cases. `/mediator/[id]`:
   - "AI maʼlumotnoma" button → `POST /ai/brief/` (with `AiThinking`) → brief card: facts, two columns of
     wants, common ground highlighted, the ZOPA line in a highlighter, risks. Save it with `PATCH brief`.
   - "Kelishuv loyihasi" → term chips prefilled from `suggested_options` → `POST /ai/agreement/` → an
     editable clause list → "Yakunlash" → `PATCH {agreement, status:"agreed"}` → the **stamp animation**
     (`Stamp`: scales from 1.6 to 1 with a slight rotation and a ring ripple) → "PDF yuklab olish".
-- [ ] **Step 2:** `/ishlar/[id]/kelishuv` is an A4 print view (`@media print`, document serif from
+- [x] **Step 2:** `/ishlar/[id]/kelishuv` is an A4 print view (`@media print`, document serif from
   `DESIGN.md`, parties, clauses, citations, signature lines, a QR to the case). The button calls
   `window.print()`. Check "Save as PDF" in Chrome.
-- [ ] **Step 3:** Screenshots, plus the printed PDF in `docs/pitch/shots/B11-kelishuv.pdf`. Pitch docs:
+- [x] **Step 3:** Screenshots, plus the printed PDF in `docs/pitch/shots/B11-kelishuv.pdf`. Pitch docs:
   `progress.md`, FT-9 → `Tayyor`. Commit `feat(web): mediator workspace, ai brief, agreement and pdf`, then push.
 
 ### B12: Ministry dashboard `/vazirlik` (P1)
