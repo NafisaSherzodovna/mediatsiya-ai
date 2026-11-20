@@ -275,7 +275,7 @@ Order when time is short:
 - Create: `web/src/app/ishlar/page.tsx`, `web/src/app/ishlar/[id]/page.tsx`, `web/src/components/case/{status-badge,timeline,position-card}.tsx`,
   `web/src/components/mediators/{mediator-card,filters,booking-sheet}.tsx`.
 
-- [ ] **Step 1:**
+- [x] **Step 1:**
   - `/ishlar`: case cards with status badges and an empty state with a CTA.
   - `/ishlar/[id]`: animated vertical timeline from `events`, the parties, both position cards once
     accepted, and the next-action panel by status:
@@ -286,7 +286,7 @@ Order when time is short:
   - Mediator choice is a sheet (vaul on mobile, dialog on desktop): filters for type, region and language;
     cards with avatar initials, rating, sessions, price and registry no; pick date and time chips →
     `POST /cases/{id}/book/` → confetti-free calm success.
-- [ ] **Step 2:** Screenshots. Pitch docs: `progress.md`, FT-6/7/8 → `Tayyor`. Commit `feat(web): case page, timeline, mediator booking`, then push.
+- [x] **Step 2:** Screenshots. Pitch docs: `progress.md`, FT-6/7/8 → `Tayyor`. Commit `feat(web): case page, timeline, mediator booking`, then push.
 
 ### B11: Mediator workspace, agreement and PDF (P0)
 

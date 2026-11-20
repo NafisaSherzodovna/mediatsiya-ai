@@ -37,9 +37,9 @@ Uzoq muddatli maqsad: Oʻzbekistonda suddan tashqari hal qilinadigan nizolar ulu
 | FT-3 | Nizo kartochkasi: tomonlar, summa, sana, hujjat va rasm yuklash | Ha |
 | FT-4 | Sud va mediatsiyani vaqt hamda xarajat bo'yicha taqqoslash ekrani | Tayyor |
 | FT-5 | Ikkinchi tomonga SMS yoki Telegram orqali havola bilan taklif yuborish; u ro'yxatdan o'tmasdan ham javob bera oladi | Tayyor |
-| FT-6 | Mediatorlar katalogi: soha, til, hudud, narx va reyting bo'yicha filtr | Ha (demo ma'lumot) |
-| FT-7 | Mediator bilan sessiya vaqtini bron qilish | Ha |
-| FT-8 | Ishning holati: Yangi, Taklif yuborildi, Rozi, Sessiya, Kelishuv, Yopildi | Ha |
+| FT-6 | Mediatorlar katalogi: soha, til, hudud, narx va reyting bo'yicha filtr | Tayyor (demo ma'lumot) |
+| FT-7 | Mediator bilan sessiya vaqtini bron qilish | Tayyor |
+| FT-8 | Ishning holati: Yangi, Taklif yuborildi, Rozi, Sessiya, Kelishuv, Yopildi | Tayyor |
 | FT-9 | Kelishuv loyihasini tahrirlash va PDF qilib yuklab olish | Ha |
 | FT-10 | Vazirlik paneli: nizo turlari, hududlar, kelishuv foizi | Ha (demo ma'lumot) |
 | FT-11 | Platformaning o'zida onlayn video sessiya | Keyin |
