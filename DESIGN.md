@@ -34,7 +34,7 @@ Light theme only. All text meets AA contrast.
 
 - Display: **Unbounded** 600–700 for titles, big numbers and the landing headline.
 - UI and body: **Onest** 400–700.
-- Documents (invite letter, agreement, print view): **Literata** 400–600. If `oʻ gʻ ʼ` render badly, use
+- Documents (invite letter, agreement, print view): **Source Serif 4** 400–600 (Literata was tried first and drew `ʻ` as a tiny mark; Source Serif 4 renders it correctly). If it ever renders badly, use
   **PT Serif** instead and update this file.
 - B1 must check `oʻ gʻ ʼ` in all three fonts with a screenshot.
 - Numbers: tabular figures; amounts are always written `9 000 000 soʻm`.

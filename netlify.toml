@@ -1,0 +1,10 @@
+# Netlify: the Next.js app lives in web/.
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # "mock" serves contract/fixtures; switched to "live" once the EC2 backend is up (task B13).
+  NEXT_PUBLIC_API_MODE = "mock"

@@ -61,14 +61,14 @@ Order when time is short:
 - `<AiSourceChip source />` shows "AI zaxira rejimi" only for `fallback`.
 - `<Avatar name />` shows initials on a tinted disc. Never use real photos of people.
 
-- [ ] **Step 1:** Scaffold, install the packages, set the fonts and tokens from `DESIGN.md` in `globals.css`,
+- [x] **Step 1:** Scaffold, install the packages, set the fonts and tokens from `DESIGN.md` in `globals.css`,
   and build `/dev/kit` (a page that shows buttons, cards, chips, AiThinking and the number styles).
-- [ ] **Step 2:** `npm run check` passes. Take a screenshot of `/dev/kit` and check that the font is Onest,
+- [x] **Step 2:** `npm run check` passes. Take a screenshot of `/dev/kit` and check that the font is Onest,
   not Times, and that `oʻ gʻ` render correctly.
 - [ ] **Step 3:** The user connects Netlify in the browser (Nafisa's account): New site from Git →
   `NafisaSherzodovna/mediatsiya-ai` → base `web`. Guide them step by step. Write the site URL into
   `docs/pitch/links.md`.
-- [ ] **Step 4:** Pitch docs: `progress.md` line + `shots/B1.png`. Commit `feat(web): scaffold, design system, mock api`, then push.
+- [x] **Step 4:** Pitch docs: `progress.md` line + `shots/B1.png`. Commit `feat(web): scaffold, design system, mock api`, then push.
 
 ### B2: AI client with failover (P0, Python)
 
