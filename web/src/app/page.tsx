@@ -21,7 +21,7 @@ import { useState } from "react";
 import { Eyebrow } from "@/components/brand/bits";
 import { Logo } from "@/components/brand/logo";
 import { CompareBars } from "@/components/case/compare-bars";
-import { GirihPattern, GuillocheRosette } from "@/components/brand/backdrop";
+import { GirihPattern } from "@/components/brand/backdrop";
 import { HeroBridge } from "@/components/landing/hero-bridge";
 import { Button } from "@/components/ui/button";
 import compareFx from "@/fixtures/compare.json";
@@ -164,7 +164,6 @@ export default function Landing() {
           </motion.ul>
         </div>
         <motion.div className="relative" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15, ease }}>
-          <GuillocheRosette className="absolute top-1/2 left-1/2 -z-10 size-[620px] -translate-x-1/2 -translate-y-1/2 opacity-80 [mask-image:radial-gradient(closest-side,black_60%,transparent)] sm:size-[760px]" />
           <HeroBridge />
         </motion.div>
       </section>

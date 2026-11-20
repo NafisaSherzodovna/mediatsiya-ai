@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Onest, Source_Serif_4, Unbounded } from "next/font/google";
-import { GuillocheWaves } from "@/components/brand/backdrop";
+import { PageBackdrop } from "@/components/brand/page-backdrop";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BRAND } from "@/lib/brand";
@@ -37,8 +37,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="uz" className={`${unbounded.variable} ${onest.variable} ${literata.variable} h-full antialiased`}>
-      <body className="bg-qogoz relative isolate flex min-h-full flex-col">
-        <GuillocheWaves className="absolute inset-x-0 top-0 -z-10 h-[240px] w-full" />
+      <body className="bg-paper relative isolate flex min-h-full flex-col">
+        <PageBackdrop />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="top-center" />
       </body>
