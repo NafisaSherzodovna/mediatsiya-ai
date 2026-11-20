@@ -80,11 +80,12 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
   - `Mediator`: list = `name, region, rating, sessions, price_uzs`.
 - `0002_demo_users` creates the four demo users from `contract/api.md` with profiles. `admin` is a superuser.
 
-- [ ] **Step 1:** Models, admin and migrations. Run `python manage.py makemigrations && python manage.py migrate`.
-- [ ] **Step 2:** Verify: `python manage.py check` passes; open `/admin/`, log in as `admin / admin123`, and
+- [x] **Step 1:** Models, admin and migrations. Run `python manage.py makemigrations && python manage.py migrate`.
+- [x] **Step 2:** Verify: `python manage.py check` passes; open `/admin/`, log in as `admin / admin123`, and
   see the "Ishlar" and "Mediatorlar" lists.
-- [ ] **Step 3:** Pitch docs: `progress.md` line ("Operator paneli (Django admin): ishlar va mediatorlar").
-- [ ] **Step 4:** Commit `feat(api): case, mediator and profile models with admin`, then push.
+- [x] **Step 3:** Pitch docs: `progress.md` line ("Operator paneli (Django admin): ishlar va mediatorlar").
+- [x] **Step 4:** Commit `feat(api): case, mediator and profile models with admin`, then push.
+- Note: `Case.created_at` and `CaseEvent.at` use `default=timezone.now`, not `auto_now_add`, because `auto_now_add` overwrites a passed value and `seed_demo` must backdate cases for `monthly`.
 
 ### A3: REST API per contract (P0)
 
