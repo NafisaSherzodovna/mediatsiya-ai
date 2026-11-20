@@ -17,7 +17,7 @@ import { motion } from "motion/react";
 import NumberFlow from "@number-flow/react";
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Eyebrow } from "@/components/brand/bits";
 import { Logo } from "@/components/brand/logo";
 import { CompareBars } from "@/components/case/compare-bars";
@@ -25,6 +25,7 @@ import { HeroBridge } from "@/components/landing/hero-bridge";
 import { Button } from "@/components/ui/button";
 import compareFx from "@/fixtures/compare.json";
 import { useUser } from "@/lib/auth";
+import { useOrigin } from "@/lib/use-origin";
 import { ROLE_HOME } from "@/lib/labels";
 import type { Comparison } from "@/lib/types";
 
@@ -73,11 +74,6 @@ const FACTS = [
   },
 ];
 
-function useOrigin() {
-  const [origin, setOrigin] = useState("");
-  useEffect(() => setOrigin(window.location.origin), []);
-  return origin;
-}
 
 export default function Landing() {
   const { user } = useUser();
