@@ -1,9 +1,8 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { HandCoins, Sparkles, Target } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
-import { Avatar } from "@/components/brand/bits";
 import { Seal } from "@/components/brand/seal";
 
 /**
@@ -94,8 +93,8 @@ export function HeroScales() {
         </AnimatePresence>
 
         {/* the two pans carry the two parties */}
-        <Pan x={leftX} y={leftY} side="left" name="Aziz Karimov" role="Uy egasi" text="3 oydan beri ijara toʻlanmayapti." />
-        <Pan x={rightX} y={rightY} side="right" name="Bekzod Umarov" role="Ijarachi" text="Ishsiz qoldim, boʻlib toʻlay olaman." />
+        <Pan x={leftX} y={leftY} side="left" title="Talab" sub="1-tomon" text="9 mln soʻm qarz qaytarilsin" />
+        <Pan x={rightX} y={rightY} side="right" title="Imkoniyat" sub="2-tomon" text="Oyiga 1,5 mln soʻm toʻlay olaman" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -125,15 +124,15 @@ function Pan({
   x,
   y,
   side,
-  name,
-  role,
+  title,
+  sub,
   text,
 }: {
   x: ReturnType<typeof useTransform<number, number>>;
   y: ReturnType<typeof useTransform<number, number>>;
   side: "left" | "right";
-  name: string;
-  role: string;
+  title: string;
+  sub: string;
   text: string;
 }) {
   // pan centre sits under the beam end: 260 ± 190 in a 520-wide box → 13.5 % / 86.5 %
@@ -144,13 +143,17 @@ function Pan({
     >
       <div className="sheet p-3">
         <div className="flex items-center gap-2">
-          <Avatar name={name} className="size-8 text-[0.65rem]" />
+          <span
+            className={`grid size-8 shrink-0 place-items-center rounded-lg ${side === "left" ? "bg-ink-wash text-ink" : "bg-accord-tint text-accord"}`}
+          >
+            {side === "left" ? <Target className="size-4" /> : <HandCoins className="size-4" />}
+          </span>
           <div className="min-w-0 leading-tight">
-            <p className="truncate text-[0.8rem] font-semibold text-ink">{name}</p>
-            <p className="text-[0.7rem] text-ink-soft">{role}</p>
+            <p className="truncate font-display text-[0.85rem] font-semibold text-ink">{title}</p>
+            <p className="text-[0.7rem] text-ink-soft">{sub}</p>
           </div>
         </div>
-        <p className={`mt-2 rounded-lg px-2.5 py-1.5 text-[0.78rem] leading-snug text-ink ${side === "left" ? "bg-ink-wash" : "bg-accord-tint"}`}>{text}</p>
+        <p className={`mt-2 flex min-h-[2.9rem] items-center rounded-lg px-2.5 py-1.5 text-[0.78rem] leading-snug text-ink ${side === "left" ? "bg-ink-wash" : "bg-accord-tint"}`}>{text}</p>
       </div>
       {/* the pan itself */}
       <div className="mx-auto mt-1 h-2 w-[80%] rounded-b-full bg-ink/80" />
