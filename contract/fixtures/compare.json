@@ -1,0 +1,39 @@
+{
+  "court": {
+    "days_min": 60,
+    "days_max": 180,
+    "cost_uzs": 1450000,
+    "items": [
+      {
+        "label": "Davlat boji (taxminiy)",
+        "uzs": 450000
+      },
+      {
+        "label": "Advokat xizmati (taxminiy)",
+        "uzs": 1000000
+      }
+    ]
+  },
+  "mediation": {
+    "days_min": 3,
+    "days_max": 14,
+    "cost_uzs": 600000,
+    "items": [
+      {
+        "label": "Mediator haqi (2 sessiya, taxminiy)",
+        "uzs": 600000
+      }
+    ]
+  },
+  "notes": [
+    "Mediatsiya muvaffaqiyatli boʻlsa, sudga toʻlangan davlat boji qaytariladi.",
+    "Kelishuvga erishilmasa, sudga borish huquqi saqlanadi."
+  ],
+  "sources": [
+    {
+      "title": "Mediatsiya toʻgʻrisidagi qonun",
+      "url": "https://lex.uz/acts/3805227"
+    }
+  ],
+  "source": "ai"
+}

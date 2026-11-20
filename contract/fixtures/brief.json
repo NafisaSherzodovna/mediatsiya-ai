@@ -1,0 +1,28 @@
+{
+  "facts": [
+    "Ijara shartnomasi 2025-yil sentyabrda tuzilgan",
+    "Oxirgi 3 oy toʻlov qilinmagan",
+    "Qarz 9 000 000 soʻm"
+  ],
+  "claimant_wants": [
+    "Qarzni toʻliq qaytarish",
+    "Ijarani davom ettirish"
+  ],
+  "respondent_wants": [
+    "Toʻlovni boʻlib toʻlash",
+    "Uyda qolish"
+  ],
+  "common_ground": [
+    "Ikkala tomon ijarani davom ettirishni xohlaydi",
+    "Qarz summasi bahsli emas"
+  ],
+  "zopa": "Qarz 6 oyda, har oy 1 500 000 soʻmdan toʻlanadi; joriy ijara haqi oʻz vaqtida toʻlanadi.",
+  "suggested_options": [
+    "6 oylik boʻlib toʻlash jadvali",
+    "Kechiksa, shartnomani bekor qilish huquqi"
+  ],
+  "risks": [
+    "Ijarachining daromadi barqaror emas"
+  ],
+  "source": "ai"
+}

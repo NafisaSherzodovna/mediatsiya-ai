@@ -1,0 +1,176 @@
+{
+  "totals": {
+    "cases": 278,
+    "agreed": 171,
+    "agreement_rate": 0.615,
+    "avg_days": 9.4,
+    "refunded_fees_uzs": 61200000,
+    "mediators_active": 42
+  },
+  "by_type": [
+    {
+      "type": "qarz",
+      "count": 96,
+      "agreed": 62
+    },
+    {
+      "type": "ijara",
+      "count": 58,
+      "agreed": 39
+    },
+    {
+      "type": "oilaviy",
+      "count": 41,
+      "agreed": 22
+    },
+    {
+      "type": "istemolchi",
+      "count": 37,
+      "agreed": 24
+    },
+    {
+      "type": "mehnat",
+      "count": 24,
+      "agreed": 13
+    },
+    {
+      "type": "qoshnichilik",
+      "count": 15,
+      "agreed": 8
+    },
+    {
+      "type": "boshqa",
+      "count": 7,
+      "agreed": 3
+    }
+  ],
+  "by_region": [
+    {
+      "region": "toshkent-sh",
+      "count": 64,
+      "agreed": 38
+    },
+    {
+      "region": "toshkent-v",
+      "count": 31,
+      "agreed": 19
+    },
+    {
+      "region": "andijon",
+      "count": 22,
+      "agreed": 13
+    },
+    {
+      "region": "fargona",
+      "count": 25,
+      "agreed": 15
+    },
+    {
+      "region": "namangan",
+      "count": 19,
+      "agreed": 11
+    },
+    {
+      "region": "samarqand",
+      "count": 28,
+      "agreed": 17
+    },
+    {
+      "region": "buxoro",
+      "count": 17,
+      "agreed": 10
+    },
+    {
+      "region": "navoiy",
+      "count": 9,
+      "agreed": 5
+    },
+    {
+      "region": "qashqadaryo",
+      "count": 14,
+      "agreed": 8
+    },
+    {
+      "region": "surxondaryo",
+      "count": 12,
+      "agreed": 7
+    },
+    {
+      "region": "jizzax",
+      "count": 8,
+      "agreed": 5
+    },
+    {
+      "region": "sirdaryo",
+      "count": 6,
+      "agreed": 4
+    },
+    {
+      "region": "xorazm",
+      "count": 13,
+      "agreed": 8
+    },
+    {
+      "region": "qoraqalpogiston",
+      "count": 10,
+      "agreed": 6
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2026-01",
+      "cases": 8,
+      "agreed": 4
+    },
+    {
+      "month": "2026-02",
+      "cases": 11,
+      "agreed": 6
+    },
+    {
+      "month": "2026-03",
+      "cases": 14,
+      "agreed": 8
+    },
+    {
+      "month": "2026-04",
+      "cases": 17,
+      "agreed": 10
+    },
+    {
+      "month": "2026-05",
+      "cases": 20,
+      "agreed": 12
+    },
+    {
+      "month": "2026-06",
+      "cases": 22,
+      "agreed": 13
+    },
+    {
+      "month": "2026-07",
+      "cases": 25,
+      "agreed": 15
+    },
+    {
+      "month": "2026-08",
+      "cases": 28,
+      "agreed": 17
+    },
+    {
+      "month": "2026-09",
+      "cases": 31,
+      "agreed": 19
+    },
+    {
+      "month": "2026-10",
+      "cases": 34,
+      "agreed": 22
+    },
+    {
+      "month": "2026-11",
+      "cases": 68,
+      "agreed": 45
+    }
+  ]
+}

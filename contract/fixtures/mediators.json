@@ -1,0 +1,129 @@
+[
+  {
+    "id": "m-01",
+    "name": "Dilnoza Rahimova",
+    "photo": "/mediators/m-01.webp",
+    "registry_no": "MR-1040",
+    "specialties": [
+      "ijara",
+      "qarz",
+      "oilaviy"
+    ],
+    "languages": [
+      "uz",
+      "ru"
+    ],
+    "region": "toshkent-sh",
+    "price_uzs": 300000,
+    "rating": 4.9,
+    "sessions": 212,
+    "years": 9,
+    "bio": "Professional mediator. Demo profil.",
+    "is_demo": true
+  },
+  {
+    "id": "m-02",
+    "name": "Shoxrux Aliyev",
+    "photo": "/mediators/m-02.webp",
+    "registry_no": "MR-1047",
+    "specialties": [
+      "qarz",
+      "istemolchi"
+    ],
+    "languages": [
+      "uz",
+      "ru"
+    ],
+    "region": "toshkent-sh",
+    "price_uzs": 350000,
+    "rating": 4.8,
+    "sessions": 174,
+    "years": 7,
+    "bio": "Professional mediator. Demo profil.",
+    "is_demo": true
+  },
+  {
+    "id": "m-03",
+    "name": "Malika Yusupova",
+    "photo": "/mediators/m-03.webp",
+    "registry_no": "MR-1054",
+    "specialties": [
+      "oilaviy",
+      "qoshnichilik"
+    ],
+    "languages": [
+      "uz",
+      "ru"
+    ],
+    "region": "samarqand",
+    "price_uzs": 400000,
+    "rating": 4.8,
+    "sessions": 133,
+    "years": 6,
+    "bio": "Professional mediator. Demo profil.",
+    "is_demo": true
+  },
+  {
+    "id": "m-04",
+    "name": "Jamshid Toʻraev",
+    "photo": "/mediators/m-04.webp",
+    "registry_no": "MR-1061",
+    "specialties": [
+      "mehnat",
+      "qarz"
+    ],
+    "languages": [
+      "uz",
+      "ru"
+    ],
+    "region": "fargona",
+    "price_uzs": 450000,
+    "rating": 4.7,
+    "sessions": 98,
+    "years": 5,
+    "bio": "Professional mediator. Demo profil.",
+    "is_demo": true
+  },
+  {
+    "id": "m-05",
+    "name": "Nigora Saidova",
+    "photo": "/mediators/m-05.webp",
+    "registry_no": "MR-1068",
+    "specialties": [
+      "ijara",
+      "istemolchi"
+    ],
+    "languages": [
+      "uz",
+      "ru"
+    ],
+    "region": "buxoro",
+    "price_uzs": 500000,
+    "rating": 4.6,
+    "sessions": 76,
+    "years": 4,
+    "bio": "Professional mediator. Demo profil.",
+    "is_demo": true
+  },
+  {
+    "id": "m-06",
+    "name": "Rustam Qodirov",
+    "photo": "/mediators/m-06.webp",
+    "registry_no": "MR-1075",
+    "specialties": [
+      "qarz",
+      "boshqa"
+    ],
+    "languages": [
+      "uz",
+      "ru"
+    ],
+    "region": "andijon",
+    "price_uzs": 550000,
+    "rating": 4.6,
+    "sessions": 64,
+    "years": 4,
+    "bio": "Professional mediator. Demo profil.",
+    "is_demo": true
+  }
+]

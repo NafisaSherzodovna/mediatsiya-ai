@@ -1,0 +1,14 @@
+{
+  "wants": [
+    "Toʻlovni boʻlib toʻlash",
+    "Uyda qolish"
+  ],
+  "can_offer": [
+    "Har oy 1 500 000 soʻm"
+  ],
+  "concerns": [
+    "Ishsiz qolgani uchun birdaniga toʻlay olmaydi"
+  ],
+  "summary": "Ijarachi qarzni tan oladi va 6 oyda toʻlashni taklif qiladi.",
+  "source": "ai"
+}

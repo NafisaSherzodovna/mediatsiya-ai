@@ -1,0 +1,9 @@
+{
+  "dispute_type": "ijara",
+  "mediable": true,
+  "reason": "Ijara haqi boʻyicha fuqarolik nizosi. Mediatsiya toʻgʻrisidagi qonun bunday nizolarga qoʻllanadi.",
+  "summary": "Ijarachi 3 oydan beri ijara haqini toʻlamayapti, qarz 9 000 000 soʻm.",
+  "amount_uzs": 9000000,
+  "confidence": 0.92,
+  "source": "ai"
+}
