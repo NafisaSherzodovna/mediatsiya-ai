@@ -200,22 +200,22 @@ Order when time is short:
 - Consumes `api('/ai/classify/')`, `api('/ai/compare/')` and `api('/ai/transcribe/')`.
 - Produces the wizard state `{text, classification, comparison, respondent, inviteText}`. B7 continues it.
 
-- [ ] **Step 1 (describe):**
+- [x] **Step 1 (describe):**
   - A large textarea with 3 example chips that fill it (ijara, qarz, isteʼmolchi) and a 20-char minimum
     with a live hint.
   - `<VoiceButton onText>`: MediaRecorder; choose `audio/webm;codecs=opus`, else `audio/mp4`; 60 s cap;
     waveform while recording; uploads, then appends the text.
   - Permission denied → inline note "Mikrofonga ruxsat berilmadi — matn bilan yozing".
   - No `MediaRecorder` → hide the button.
-- [ ] **Step 2 (classify):**
+- [x] **Step 2 (classify):**
   - `AiThinking` with steps "Matn oʻqilmoqda", "Nizo turi aniqlanmoqda", "Qonun bilan solishtirilmoqda".
   - Then the card: type label, summary, amount, confidence ring and `AiSourceChip`.
   - If `mediable === false`: a calm red-pen card with the reason and contact suggestions; the wizard stops.
-- [ ] **Step 3 (compare):**
+- [x] **Step 3 (compare):**
   - Two columns, "Sud" vs "Mediatsiya". Day bars and cost bars grow with spring motion; numbers use
     NumberFlow; item breakdowns; notes; source links; the "taxminiy" label.
   - CTA "Mediatsiyani tanlash".
-- [ ] **Step 4:** Screenshots of each step at 390 and 1440 px. Pitch docs: `progress.md`, `shots/B6.png`,
+- [x] **Step 4:** Screenshots of each step at 390 and 1440 px. Pitch docs: `progress.md`, `shots/B6.png`,
   FT-2/FT-4 → `Tayyor`. Commit `feat(web): intake wizard with ai classify and compare`, then push.
 
 ### B7: Invite and case creation (P0)
@@ -223,7 +223,7 @@ Order when time is short:
 **Files:**
 - Create: `web/src/components/intake/{respondent-step,invite-step,sent-step}.tsx`.
 
-- [ ] **Step 1:**
+- [x] **Step 1:**
   - The respondent step collects name and phone (`+998` mask).
   - The invite step shows `AiThinking`, then an editable invite text with the `checks` as green ticks.
   - "Yuborish" → `POST /cases/` (whole wizard state) → the sent step:
@@ -231,7 +231,7 @@ Order when time is short:
     - the invite link `${origin}/taklif/${invite_token}`;
     - buttons "Telegram orqali" (`https://t.me/share/url?url=…&text=…`), "Nusxa olish" and a QR code;
     - "Ishni koʻrish" → `/ishlar/[id]`.
-- [ ] **Step 2:** Screenshots. Pitch docs: `progress.md`, FT-5 → `Tayyor`. Commit `feat(web): ai invite and case creation`, then push.
+- [x] **Step 2:** Screenshots. Pitch docs: `progress.md`, FT-5 → `Tayyor`. Commit `feat(web): ai invite and case creation`, then push.
 
 ### B8: Respondent page `/taklif/[token]` (P0, public, phone-first)
 
