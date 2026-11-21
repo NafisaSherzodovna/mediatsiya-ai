@@ -6,5 +6,17 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  # "mock" serves contract/fixtures; switched to "live" once the EC2 backend is up (task B13).
-  NEXT_PUBLIC_API_MODE = "mock"
+  NEXT_PUBLIC_API_MODE = "live"
+
+# The EC2 backend (deploy/README.md); the browser only talks to Netlify, so no CORS.
+[[redirects]]
+  from = "/api/*"
+  to = "https://32-236-205-232.sslip.io/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/admin/*"
+  to = "https://32-236-205-232.sslip.io/admin/:splat"
+  status = 200
+  force = true
