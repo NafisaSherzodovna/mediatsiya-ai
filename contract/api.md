@@ -45,7 +45,7 @@ type Position = { wants: string[]; can_offer: string[]; concerns: string[]; summ
 type Brief = { facts: string[]; claimant_wants: string[]; respondent_wants: string[]; common_ground: string[];
   zopa: string; suggested_options: string[]; risks: string[]; source: AiSource };
 type Citation = { article: string; title: string; url: string };
-type Agreement = { title: string; clauses: { title: string; body: string }[]; citations: Citation[]; source: AiSource };
+type Agreement = { title: string; clauses: { title: string; body: string }[]; citations: Citation[]; source: AiSource | "mediator" /*the mediator writes it; POST /ai/agreement/ is no longer used by the web*/ };
 // Fields follow the Ministry of Justice mediator registry (Art. 9³). `specialties` was removed 2026-11-21 (user request).
 type Mediator = { id: string; name: string; photo: string; registry_no: string; registry_date: string | null /*YYYY-MM-DD*/;
   areas: Area[]; languages: Lang[]; address: string; phone: string; email: string;
