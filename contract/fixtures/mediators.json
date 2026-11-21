@@ -4,126 +4,170 @@
     "name": "Dilnoza Rahimova",
     "photo": "/mediators/m-01.webp",
     "registry_no": "MR-1040",
-    "specialties": [
-      "ijara",
-      "qarz",
+    "registry_date": "2020-04-08",
+    "areas": [
+      "fuqarolik",
       "oilaviy"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Toshkent shahri, demo manzil",
+    "phone": "+998901001111",
+    "email": "m-01@mediatsiya.demo",
+    "certificate_no": "M 000037",
+    "certificate_date": "2020-03-09",
     "region": "toshkent-sh",
     "price_uzs": 300000,
     "rating": 4.9,
     "sessions": 212,
     "years": 9,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 131,
+    "reviews": 92
   },
   {
     "id": "m-02",
     "name": "Shoxrux Aliyev",
     "photo": "/mediators/m-02.webp",
     "registry_no": "MR-1047",
-    "specialties": [
-      "qarz",
-      "istemolchi"
+    "registry_date": "2021-07-15",
+    "areas": [
+      "fuqarolik"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Toshkent shahri, demo manzil",
+    "phone": "+998901002222",
+    "email": "m-02@mediatsiya.demo",
+    "certificate_no": "M 000074",
+    "certificate_date": "2021-06-15",
     "region": "toshkent-sh",
     "price_uzs": 350000,
     "rating": 4.8,
     "sessions": 174,
     "years": 7,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 108,
+    "reviews": 76
   },
   {
     "id": "m-03",
     "name": "Malika Yusupova",
     "photo": "/mediators/m-03.webp",
     "registry_no": "MR-1054",
-    "specialties": [
-      "oilaviy",
-      "qoshnichilik"
+    "registry_date": "2022-10-22",
+    "areas": [
+      "fuqarolik",
+      "oilaviy"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Samarqand, demo manzil",
+    "phone": "+998901003333",
+    "email": "m-03@mediatsiya.demo",
+    "certificate_no": "M 000111",
+    "certificate_date": "2022-09-22",
     "region": "samarqand",
     "price_uzs": 400000,
     "rating": 4.8,
     "sessions": 133,
     "years": 6,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 82,
+    "reviews": 57
   },
   {
     "id": "m-04",
     "name": "Jamshid Toʻraev",
     "photo": "/mediators/m-04.webp",
     "registry_no": "MR-1061",
-    "specialties": [
-      "mehnat",
-      "qarz"
+    "registry_date": "2023-01-02",
+    "areas": [
+      "fuqarolik",
+      "mehnat"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Fargʻona, demo manzil",
+    "phone": "+998901004444",
+    "email": "m-04@mediatsiya.demo",
+    "certificate_no": "M 000148",
+    "certificate_date": "2022-12-03",
     "region": "fargona",
     "price_uzs": 450000,
     "rating": 4.7,
     "sessions": 98,
     "years": 5,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 61,
+    "reviews": 43
   },
   {
     "id": "m-05",
     "name": "Nigora Saidova",
     "photo": "/mediators/m-05.webp",
     "registry_no": "MR-1068",
-    "specialties": [
-      "ijara",
-      "istemolchi"
+    "registry_date": "2019-04-09",
+    "areas": [
+      "fuqarolik"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Buxoro, demo manzil",
+    "phone": "+998901005555",
+    "email": "m-05@mediatsiya.demo",
+    "certificate_no": "M 000185",
+    "certificate_date": "2019-03-10",
     "region": "buxoro",
     "price_uzs": 500000,
     "rating": 4.6,
     "sessions": 76,
     "years": 4,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 47,
+    "reviews": 33
   },
   {
     "id": "m-06",
     "name": "Rustam Qodirov",
     "photo": "/mediators/m-06.webp",
     "registry_no": "MR-1075",
-    "specialties": [
-      "qarz",
-      "boshqa"
+    "registry_date": "2020-07-16",
+    "areas": [
+      "fuqarolik"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Andijon, demo manzil",
+    "phone": "+998901006666",
+    "email": "m-06@mediatsiya.demo",
+    "certificate_no": "M 000222",
+    "certificate_date": "2020-06-16",
     "region": "andijon",
     "price_uzs": 550000,
     "rating": 4.6,
     "sessions": 64,
     "years": 4,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 40,
+    "reviews": 28
   }
 ]

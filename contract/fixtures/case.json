@@ -127,22 +127,29 @@
     "name": "Dilnoza Rahimova",
     "photo": "/mediators/m-01.webp",
     "registry_no": "MR-1040",
-    "specialties": [
-      "ijara",
-      "qarz",
+    "registry_date": "2020-04-08",
+    "areas": [
+      "fuqarolik",
       "oilaviy"
     ],
     "languages": [
       "uz",
       "ru"
     ],
+    "address": "Toshkent shahri, demo manzil",
+    "phone": "+998901001111",
+    "email": "m-01@mediatsiya.demo",
+    "certificate_no": "M 000037",
+    "certificate_date": "2020-03-09",
     "region": "toshkent-sh",
     "price_uzs": 300000,
     "rating": 4.9,
     "sessions": 212,
     "years": 9,
     "bio": "Professional mediator. Demo profil.",
-    "is_demo": true
+    "is_demo": true,
+    "resolved": 131,
+    "reviews": 92
   },
   "session_at": "2026-11-24T10:00:00+05:00",
   "agreement": null,
@@ -170,5 +177,71 @@
     }
   ],
   "created_at": "2026-11-20T09:12:00+05:00",
-  "updated_at": "2026-11-20T12:05:00+05:00"
+  "updated_at": "2026-11-20T12:05:00+05:00",
+  "review": null,
+  "payment": {
+    "fee_uzs": 300000,
+    "commission_uzs": 30000,
+    "mediator_payout_uzs": 270000,
+    "claimant_share_uzs": 150000,
+    "respondent_share_uzs": 150000,
+    "claimant_paid_at": null,
+    "respondent_paid_at": null,
+    "status": "pending"
+  },
+  "proposed_mediator": null,
+  "proposed_session_at": null,
+  "procedure": {
+    "title": "Mediatsiya tartib-taomilini amalga oshirish toʻgʻrisidagi kelishuv № MD-2026-0042",
+    "language": "uz",
+    "started_at": "2026-11-20T18:08:21.273019+05:00",
+    "deadline": "2026-12-20T18:08:21.273019+05:00",
+    "clauses": [
+      {
+        "title": "1. Taraflar",
+        "body": "Murojaatchi: Aziz Karimov. Ikkinchi tomon: Bekzod Umarov. Taraflar mediatsiyada shaxsan yoki vakili orqali ishtirok etadi (10-modda)."
+      },
+      {
+        "title": "2. Nizo predmeti",
+        "body": "Ijara, 9 000 000 soʻm: Ijarachi 3 oydan beri ijara haqini toʻlamayapti, qarz 9 000 000 soʻm."
+      },
+      {
+        "title": "3. Mediator",
+        "body": "Dilnoza Rahimova, Adliya vazirligi Mediatorlar reyestri № MR-1040. Mediator mustaqil va xolis; mustaqilligiga taʼsir qiluvchi holat yuzaga kelsa, bu haqda taraflarga aytadi va mediatsiyadan voz kechadi (9, 13-moddalar)."
+      },
+      {
+        "title": "4. Tartib-taomil tartibi",
+        "body": "Mediator taraflar bilan birgalikda va har biri bilan alohida uchrashuvlar oʻtkazadi, ogʻzaki va yozma tavsiyalar beradi (13-modda). Muloqot Murosa platformasidagi maxfiy suhbat va uchrashuvlar orqali olib boriladi. Yarashishga majburlash taqiqlanadi (7-modda)."
+      },
+      {
+        "title": "5. Til va joy",
+        "body": "Mediatsiya oʻzbek tilida oʻtkaziladi. Joy: onlayn, Murosa platformasi; yuzma-yuz uchrashuv kelishilsa, mediator manzili: Toshkent shahri, demo manzil."
+      },
+      {
+        "title": "6. Sana va muddat",
+        "body": "Mediatsiya 20.11.2026 kuni, ushbu kelishuv tuzilgan kundan boshlanadi (19-modda) va 20.12.2026 gacha (30 kun) tugallanishi kerak. Taraflarning oʻzaro roziligi bilan muddat bir marta 30 kungacha uzaytirilishi mumkin; muddat oʻtsa, mediatsiya tugatiladi (23, 24-moddalar). Mediatsiya davomida daʼvo muddatining oʻtishi toʻxtatib turiladi (21-modda)."
+      },
+      {
+        "title": "7. Taraflarning huquqlari",
+        "body": "Har bir taraf mediatordan va mediatsiyaning istalgan bosqichida unda ishtirok etishdan voz kechishga haqli (7, 11-moddalar). Mediativ kelishuvga erishilsa, u yozma shaklda tuziladi, taraflar imzolaydi va mediator tasdiqlaydi; u majburiy kuchga ega, ixtiyoriy bajarilmasa sudga murojaat qilinadi (29, 29¹-moddalar)."
+      },
+      {
+        "title": "8. Maxfiylik",
+        "body": "Mediatsiya davomida maʼlum boʻlgan maʼlumotlar uni bergan tarafning yozma roziligisiz oshkor qilinmaydi. Mediator bir tarafdan olgan maʼlumotni ikkinchi tarafga faqat uning roziligi bilan aytadi (6, 26, 27-moddalar)."
+      },
+      {
+        "title": "9. Xarajatlar",
+        "body": "Mediator haqi 300 000 soʻm; taraflar teng ulushda, 150 000 soʻm va 150 000 soʻm dan toʻlaydi (28-modda). Pul Murosa platformasi hisobida saqlanadi; mediativ kelishuv tuzilgach, 10 % platforma xizmat haqi ushlab qolinib, qolgani mediatorga oʻtkaziladi. Mediator mediatsiyani rad etsa yoki taraf mediatordan voz kechsa, toʻlangan pul toʻliq qaytariladi. Mediatsiya kelishuvsiz tugatilsa: ikkala ulush toʻlangan va kamida bitta uchrashuv oʻtkazilgan boʻlsa, haq mediatorga oʻtkaziladi, aks holda toʻliq qaytariladi."
+      }
+    ],
+    "note": "Taraflar ushbu kelishuvga platformada elektron rozilik bildirgan: murojaatchi mediatorni taklif qilib, ikkinchi tomon uni tasdiqlab."
+  },
+  "procedure_deadline": "2026-12-20T18:08:21.273019+05:00",
+  "extended": false,
+  "extension_requested_by": "",
+  "termination_reason": "",
+  "signatories": {
+    "claimant": null,
+    "respondent": null
+  }
 }
