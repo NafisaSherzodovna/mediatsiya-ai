@@ -11,5 +11,5 @@
 |---|---|
 | Murojaatchi | `ariza` / `ariza123` |
 | Mediator | `mediator` / `mediator123` |
-| Vazirlik | `vazirlik` / `vazirlik123` |
+| Boshqa mediatorlar (m-02…m-42) | `m02` … `m42` / `mediator123` |
 | Admin | `admin` / `admin123` |

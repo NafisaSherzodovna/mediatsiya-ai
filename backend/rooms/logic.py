@@ -22,7 +22,8 @@ def approvals_state(case) -> dict:
     h = agreement_hash(case.agreement)
     out = {"claimant": None, "respondent": None}
     for a in Approval.objects.filter(case=case):
-        out[a.party] = {"decision": a.decision, "comment": a.comment, "at": a.at.isoformat(), "current": bool(h) and a.agreement_hash == h}
+        out[a.party] = {"decision": a.decision, "comment": a.comment, "at": a.at.isoformat(), "current": bool(h) and a.agreement_hash == h,
+                        "full_name": a.full_name, "address": a.address}
     return out
 
 

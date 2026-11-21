@@ -5,7 +5,6 @@ from django.db import models
 class Role(models.TextChoices):
     CLAIMANT = "claimant", "Murojaatchi"
     MEDIATOR = "mediator", "Mediator"
-    MINISTRY = "ministry", "Vazirlik"
     ADMIN = "admin", "Administrator"
 
 
@@ -21,3 +20,11 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.full_name
+
+
+def split_full_name(full_name: str) -> tuple[str, str]:
+    """F.I.Sh. order: "Nuraliyev Ibrohim Bahodir oʻgʻli" -> last "Nuraliyev", first "Ibrohim Bahodir oʻgʻli"."""
+    parts = full_name.split()
+    if len(parts) < 2:
+        return full_name.strip(), ""
+    return " ".join(parts[1:])[:150], parts[0][:150]

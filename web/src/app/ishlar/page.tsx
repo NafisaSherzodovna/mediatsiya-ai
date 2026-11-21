@@ -1,13 +1,17 @@
 "use client";
 
-import { FilePlus2, Inbox } from "lucide-react";
+import { ArrowRight, FilePlus2, Inbox, MailOpen } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 import { CaseCard } from "@/components/case/parts";
 import { AppShell } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/api";
-import type { Case } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import { api, errorText } from "@/lib/api";
+import { DISPUTE_LABEL, STATUS_LABEL } from "@/lib/labels";
+import type { Case, Me, MyInvite } from "@/lib/types";
 
 export default function IshlarPage() {
   return (
@@ -32,6 +36,7 @@ function List() {
           </Link>
         </Button>
       </div>
+      <Invites />
       {error && <p className="text-stop">Ishlarni yuklab boʻlmadi. Sahifani yangilang.</p>}
       {!data && !error && (
         <div className="grid gap-3">
@@ -56,5 +61,78 @@ function List() {
         ))}
       </div>
     </div>
+  );
+}
+
+/** Invitations where someone named this user's phone as the other party. */
+function Invites() {
+  const { data: me, mutate: refreshMe } = useSWR<Me>("/auth/me/", (p: string) => api<Me>(p));
+  const { data, mutate } = useSWR<MyInvite[]>(me?.phone ? "/my-invites/" : null, (p: string) => api<MyInvite[]>(p), { refreshInterval: 10000 });
+  const [phone, setPhone] = useState("+998 ");
+  const [busy, setBusy] = useState(false);
+
+  async function savePhone() {
+    setBusy(true);
+    try {
+      await refreshMe(await api<Me>("/auth/me/", { method: "PATCH", body: { phone } }), { revalidate: false });
+      void mutate();
+      toast.success("Telefon raqami saqlandi");
+    } catch (e) {
+      toast.error(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!me) return null;
+  if (!me.phone) {
+    return (
+      <section className="sheet mb-6 p-5">
+        <h2 className="flex items-center gap-2 font-semibold text-ink">
+          <MailOpen className="size-5 text-accord" /> Sizga kelgan takliflar
+        </h2>
+        <p className="mt-1 text-sm text-ink-soft">Kimdir sizni ikkinchi tomon sifatida koʻrsatgan boʻlsa, taklif shu yerda chiqadi. Buning uchun telefon raqamingizni kiriting.</p>
+        <form
+          className="mt-3 flex flex-wrap gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void savePhone();
+          }}
+        >
+          <Input type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-11 max-w-xs text-base" aria-label="Telefon raqami" />
+          <Button type="submit" variant="outline" disabled={busy || phone.replace(/\D/g, "").length < 9}>
+            Saqlash
+          </Button>
+        </form>
+      </section>
+    );
+  }
+  if (!data?.length) return null;
+  return (
+    <section className="mb-8">
+      <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-ink">
+        <MailOpen className="size-5 text-accord" /> Sizga kelgan takliflar
+      </h2>
+      <div className="grid gap-3">
+        {data.map((x) => (
+          <Link
+            key={x.code}
+            href={`/taklif/${x.invite_token}`}
+            className="sheet flex items-center justify-between gap-3 p-4 transition-shadow hover:shadow-[var(--shadow-sheet)]"
+          >
+            <span className="min-w-0">
+              <span className="block font-mono text-xs text-ink-soft">{x.code}</span>
+              <span className="block font-semibold text-ink">
+                {x.claimant_name} · {DISPUTE_LABEL[x.dispute_type]}
+              </span>
+              <span className="block text-sm text-ink-soft">{STATUS_LABEL[x.status]}</span>
+            </span>
+            <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-accord">
+              {x.status === "invited" ? "Javob berish" : "Ochish"} <ArrowRight className="size-4" />
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }

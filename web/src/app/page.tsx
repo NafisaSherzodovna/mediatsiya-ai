@@ -2,9 +2,9 @@
 
 import {
   ArrowRight,
-  Building2,
   ExternalLink,
   FileSignature,
+  Handshake,
   Lock,
   Mic,
   Scale,
@@ -22,6 +22,8 @@ import { Eyebrow } from "@/components/brand/bits";
 import { Logo } from "@/components/brand/logo";
 import { CompareBars } from "@/components/case/compare-bars";
 import { HeroScales } from "@/components/landing/hero-scales";
+import { UserMenu } from "@/components/shell/app-header";
+import { LiveStats } from "@/components/landing/live-stats";
 import { Button } from "@/components/ui/button";
 import compareFx from "@/fixtures/compare.json";
 import { useUser } from "@/lib/auth";
@@ -41,7 +43,7 @@ const STEPS = [
 const ROLES = [
   { icon: UserRound, title: "Fuqaro va biznes", text: "Sudga bormasdan, bir necha kunda va arzonroq. Munosabat buzilmaydi." },
   { icon: Scale, title: "Mediator", text: "Tayyor mijoz oqimi va AI tayyorlagan 1 sahifalik maʼlumotnoma. Sessiya qisqaradi." },
-  { icon: Building2, title: "Adliya vazirligi", text: "Mediatsiya boʻyicha jonli statistika: hudud, nizo turi, kelishuv foizi." },
+  { icon: Handshake, title: "Ikkinchi tomon", text: "Hisob ochmasdan, havola orqali javob beradi. Mediator haqi tomonlar oʻrtasida teng boʻlinadi." },
 ];
 
 const FACTS = [
@@ -92,17 +94,15 @@ export default function Landing() {
             <a href="#taqqoslash" className="rounded-lg px-3 py-2 hover:bg-ink-wash hover:text-ink">
               Sud va mediatsiya
             </a>
-            <a href="#raqamlar" className="rounded-lg px-3 py-2 hover:bg-ink-wash hover:text-ink">
-              Raqamlar
+            <a href="#statistika" className="rounded-lg px-3 py-2 hover:bg-ink-wash hover:text-ink">
+              Statistika
             </a>
             <Link href="/huquq" className="rounded-lg px-3 py-2 hover:bg-ink-wash hover:text-ink">
               Huquqiy yordamchi
             </Link>
           </nav>
-          <div className="ml-auto flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href={user ? ROLE_HOME[user.role] : "/kirish"}>{user ? "Kabinet" : "Kirish"}</Link>
-            </Button>
+          <div className="ml-auto flex items-center gap-2">
+            <UserMenu />
           </div>
         </div>
       </header>
@@ -233,9 +233,18 @@ export default function Landing() {
             >
               EBRD
             </a>
-            ). Platforma uni real vaqtda beradi.
+            ). Platforma uni{" "}
+            <a href="#statistika" className="underline decoration-white/40 hover:decoration-white">
+              real vaqtda beradi
+            </a>
+            .
           </p>
         </div>
+      </section>
+
+      {/* Live platform statistics (public) */}
+      <section id="statistika" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-16 sm:py-20">
+        <LiveStats />
       </section>
 
       {/* Roles */}

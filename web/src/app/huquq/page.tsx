@@ -2,12 +2,11 @@
 
 import { ArrowUp, BookOpenText, ExternalLink, ScrollText } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AiThinking } from "@/components/brand/ai-thinking";
 import { AiSourceChip } from "@/components/brand/bits";
-import { Logo } from "@/components/brand/logo";
+import { AppHeader } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
 import { api, errorText } from "@/lib/api";
 import type { AskAnswer } from "@/lib/types";
@@ -44,14 +43,7 @@ export default function HuquqPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="mx-auto flex h-16 w-full max-w-3xl items-center justify-between px-4">
-        <Link href="/">
-          <Logo />
-        </Link>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/kirish?next=/murojaat">Murojaat qilish</Link>
-        </Button>
-      </header>
+      <AppHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-20">
         <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-accord uppercase">
           <ScrollText className="size-4" /> Huquqiy yordamchi

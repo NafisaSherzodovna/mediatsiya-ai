@@ -15,7 +15,7 @@ import { useOrigin } from "@/lib/use-origin";
 export default function KelishuvPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <AppShell roles={["claimant", "mediator", "ministry", "admin"]} wide>
+    <AppShell roles={["claimant", "mediator", "admin"]} wide>
       <Doc id={id} />
     </AppShell>
   );

@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Onest, Source_Serif_4, Unbounded } from "next/font/google";
 import { PageBackdrop } from "@/components/brand/page-backdrop";
+import { YangiBridge } from "@/components/brand/yangi-bridge";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BRAND } from "@/lib/brand";
+import { toYangi } from "@/lib/yangi";
 import "./globals.css";
 
 const unbounded = Unbounded({
@@ -24,8 +26,8 @@ const literata = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: `${BRAND.name} — nizoni sudsiz hal qilish`,
-  description: BRAND.tagline,
+  title: toYangi(`${BRAND.name} — nizoni sudsiz hal qilish`),
+  description: toYangi(BRAND.tagline),
 };
 
 export const viewport: Viewport = {
@@ -41,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <PageBackdrop />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="top-center" />
+        <YangiBridge />
       </body>
     </html>
   );

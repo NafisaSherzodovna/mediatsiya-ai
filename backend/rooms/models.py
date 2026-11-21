@@ -61,6 +61,9 @@ class Approval(models.Model):
     party = models.CharField("Tomon", max_length=12, choices=Party.choices)
     decision = models.CharField("Qaror", max_length=10)  # approved | changes
     comment = models.CharField("Izoh", max_length=500, blank=True)
+    # Art. 29: the agreement must name each party in full and give a residence or postal address
+    full_name = models.CharField("F.I.Sh. (toʻliq)", max_length=160, blank=True)
+    address = models.CharField("Yashash joyi yoki pochta manzili", max_length=250, blank=True)
     agreement_hash = models.CharField(max_length=40)
     at = models.DateTimeField(default=timezone.now)
 

@@ -51,6 +51,11 @@ export function dateUz(iso: string, withTime = true): string {
   return withTime ? `${base}, ${String(p.h).padStart(2, "0")}:${String(p.m).padStart(2, "0")}` : base;
 }
 
+/** "2020-04-08" → "08.04.2020", the format the Ministry's mediator registry uses. */
+export function dmy(ymd: string): string {
+  return ymd.slice(0, 10).split("-").reverse().join(".");
+}
+
 export function monthUz(yyyyMm: string): string {
   const m = Number(yyyyMm.slice(5, 7));
   const name = MONTHS[m - 1];

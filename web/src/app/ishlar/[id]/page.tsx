@@ -8,6 +8,9 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { Avatar } from "@/components/brand/bits";
 import { CaseHeader, PositionCard, Timeline } from "@/components/case/parts";
+import { PaymentCard } from "@/components/case/payment";
+import { ProcedureDoc, TermCard, TerminateButton } from "@/components/case/procedure";
+import { ReviewCard } from "@/components/case/review";
 import { BookingDialog } from "@/components/mediators/booking";
 import { PartyApproval } from "@/components/room/approval";
 import { ChatPanel } from "@/components/room/chat";
@@ -15,7 +18,8 @@ import { MeetingsPanel } from "@/components/room/meetings";
 import { RoomTabs } from "@/components/room/tabs";
 import { AppShell } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/api";
+import { toYangi } from "@/lib/yangi";
+import { api, errorText } from "@/lib/api";
 import { useRoom } from "@/lib/rooms";
 import { dateUz } from "@/lib/format";
 import type { Case } from "@/lib/types";
@@ -24,7 +28,7 @@ import { useOrigin } from "@/lib/use-origin";
 export default function CasePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   return (
-    <AppShell roles={["claimant", "admin", "ministry"]} wide>
+    <AppShell roles={["claimant", "admin"]} wide>
       <CaseView id={id} />
     </AppShell>
   );
@@ -92,7 +96,16 @@ function CaseView({ id }: { id: string }) {
 
       <div className={`mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr] ${room && tab !== "holat" ? "hidden" : ""}`}>
         <div className="space-y-6">
-          <NextAction c={c} link={link} onBook={() => setBooking(true)} />
+          <NextAction c={c} link={link} onBook={() => setBooking(true)} onUpdate={(u) => void mutate(u, { revalidate: false })} />
+          {(c.status === "agreed" || c.status === "closed") && c.mediator && (
+            <ReviewCard c={c} onDone={(u) => void mutate(u, { revalidate: false })} />
+          )}
+          {c.payment && <PaymentCard payment={c.payment} party="claimant" target={{ kind: "case", id }} onPaid={() => void mutate()} />}
+          {c.status === "scheduled" && <TermCard room={c} party="claimant" target={{ kind: "case", id }} onChange={() => void mutate()} />}
+          {c.procedure && <ProcedureDoc p={c.procedure} />}
+          {["new", "invited", "accepted", "scheduled"].includes(c.status) && (
+            <TerminateButton target={{ kind: "case", id }} who="party" onDone={() => void mutate()} />
+          )}
 
           {(c.claimant_position || c.respondent_position) && (
             <section>
@@ -158,14 +171,34 @@ function Panel({ icon, tone, title, children }: { icon: React.ReactNode; tone: s
   );
 }
 
-function NextAction({ c, link, onBook }: { c: Case; link: string; onBook: () => void }) {
+const REJECTED: Record<string, string> = {
+  mediator_rejected: "Ikkinchi tomon taklif qilingan mediatorni rad etdi",
+  mediator_dropped_respondent: "Ikkinchi tomon mediatordan voz kechdi",
+  mediator_dropped_claimant: "Siz mediatordan voz kechdingiz",
+};
+
+function NextAction({ c, link, onBook, onUpdate }: { c: Case; link: string; onBook: () => void; onUpdate: (c: Case) => void }) {
+  const [busy, setBusy] = useState(false);
+  async function dropMediator() {
+    if (!window.confirm("Mediatordan voz kechasizmi? Toʻlangan pul qaytariladi, mediator bilan yozishmalar va uchrashuvlar oʻchiriladi.")) return;
+    setBusy(true);
+    try {
+      onUpdate(await api<Case>(`/cases/${c.id}/drop-mediator/`, { body: {} }));
+      toast.success("Mediatordan voz kechildi. Boshqa mediator taklif qiling");
+    } catch (e) {
+      toast.error(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (c.status === "invited" || c.status === "new") {
     return (
       <Panel icon={<Hourglass className="size-5 text-warn" />} tone="border-warn/30 bg-warn-tint" title="Ikkinchi tomon javobi kutilmoqda">
         <p>{c.respondent.name} havolani ochib, roziligini bildiradi. Sahifa avtomatik yangilanadi.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild size="sm" className="bg-[#229ED9] text-white hover:bg-[#1b8bc0]">
-            <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(c.invite_text)}`} target="_blank" rel="noreferrer">
+            <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(toYangi(c.invite_text))}`} target="_blank" rel="noreferrer">
               <Send className="size-4" /> Qayta yuborish
             </a>
           </Button>
@@ -180,12 +213,30 @@ function NextAction({ c, link, onBook }: { c: Case; link: string; onBook: () => 
       </Panel>
     );
   }
-  if (c.status === "accepted") {
+  if (c.status === "accepted" && c.proposed_mediator) {
     return (
-      <Panel icon={<Scale className="size-5 text-seal" />} tone="border-seal/25 bg-seal-tint" title="Ikkinchi tomon rozi! Mediator tanlang">
-        <p>Reyestrdagi mediatorlardan birini tanlab, sessiya vaqtini belgilang.</p>
+      <Panel icon={<Hourglass className="size-5 text-warn" />} tone="border-warn/30 bg-warn-tint" title="Ikkinchi tomon mediatorni tasdiqlashi kutilmoqda">
+        <p>
+          Siz <b className="text-ink">{c.proposed_mediator.name}</b>ni taklif qildingiz
+          {c.proposed_session_at ? ` (${dateUz(c.proposed_session_at)})` : ""}. Qonunga koʻra mediatorni taraflar birgalikda tanlaydi (8, 22-moddalar).
+        </p>
+        <Button className="mt-3" variant="outline" size="sm" onClick={onBook}>
+          Boshqa mediator taklif qilish
+        </Button>
+      </Panel>
+    );
+  }
+  if (c.status === "accepted") {
+    const last = c.events.at(-1)?.kind === "refunded" ? c.events.at(-2)?.kind : c.events.at(-1)?.kind;
+    return (
+      <Panel
+        icon={<Scale className="size-5 text-seal" />}
+        tone="border-seal/25 bg-seal-tint"
+        title={last && REJECTED[last] ? REJECTED[last] : "Ikkinchi tomon rozi! Mediator taklif qiling"}
+      >
+        <p>Reyestrdagi mediatorlardan birini va sessiya vaqtini tanlang. Ikkinchi tomon tasdiqlagach, sessiya belgilanadi.</p>
         <Button className="mt-3" variant="accord" onClick={onBook}>
-          Mediator tanlash
+          Mediator taklif qilish
         </Button>
       </Panel>
     );
@@ -197,6 +248,9 @@ function NextAction({ c, link, onBook }: { c: Case; link: string; onBook: () => 
           Mediator <b className="text-ink">{c.mediator.name}</b> · {c.session_at ? dateUz(c.session_at) : "vaqt kelishilmoqda"}. Mediator AI tayyorlagan maʼlumotnoma bilan
           sessiyaga tayyorlanadi.
         </p>
+        <Button className="mt-3" variant="ghost" size="sm" disabled={busy} onClick={dropMediator}>
+          Mediatordan voz kechish
+        </Button>
       </Panel>
     );
   }
@@ -207,6 +261,18 @@ function NextAction({ c, link, onBook }: { c: Case; link: string; onBook: () => 
         <Button asChild className="mt-3" variant="accord">
           <Link href={`/ishlar/${c.id}/kelishuv`}>Kelishuvni koʻrish</Link>
         </Button>
+      </Panel>
+    );
+  }
+  if (c.status === "terminated") {
+    const ended = [...c.events].reverse().find((e) => e.kind.startsWith("terminated_"));
+    return (
+      <Panel icon={<XCircle className="size-5 text-ink-soft" />} tone="border-rule bg-muted" title="Mediatsiya tugatildi">
+        <p>
+          {ended?.label ?? "Mediatsiya kelishuvsiz tugatildi"}
+          {c.termination_reason ? `: «${c.termination_reason}».` : "."} Sudga murojaat qilish huquqingiz saqlanadi; xohlasangiz, yangi murojaat bilan qayta urinib
+          koʻring.
+        </p>
       </Panel>
     );
   }

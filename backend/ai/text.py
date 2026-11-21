@@ -11,9 +11,13 @@ _CYR = {
 _APOS = re.compile(r"['‘’`ʼ]")
 
 
+# The new Uzbek alphabet (ş ç ğ ö) maps back to the classic spelling the corpus and keyword rules use.
+_YANGI = {"ş": "sh", "ç": "ch", "ğ": "gʻ", "ö": "oʻ"}
+
+
 def normalize(s: str) -> str:
     """Lowercase, Cyrillic Uzbek/Russian -> Latin, every apostrophe variant -> ʻ (U+02BB)."""
-    out = "".join(_CYR.get(ch, ch) for ch in s.lower())
+    out = "".join(_CYR.get(ch, _YANGI.get(ch, ch)) for ch in s.lower())
     return _APOS.sub("ʻ", out)
 
 

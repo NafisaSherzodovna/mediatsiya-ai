@@ -59,7 +59,7 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
 - `Profile`: `user` (1-1 to `auth.User`), `role` (choices `Role`), `full_name`, `phone`.
 - `Mediator`:
   - `id` CharField pk (`m-01`…), `user` FK nullable, `name`, `photo`, `registry_no`;
-  - `specialties` JSONField list, `languages` JSONField list;
+  - `areas` JSONField list (Art. 3 mediation areas; `specialties` removed 2026-11-21), `languages` JSONField list, registry fields (`registry_date`, `address`, `phone`, `email`, `certificate_no`, `certificate_date`, `removed_at`);
   - `region` (choices), `price_uzs` int, `rating` float, `sessions` int, `years` int, `bio`;
   - `is_demo` bool.
 - `Case`:
@@ -127,7 +127,7 @@ Order when time is short: A1 → A2 → A3 → A4 are P0; A5 is P1.
   with `contract/fixtures/*.json` by eye.
 - [x] **Step 4:** Pitch docs: `progress.md` line ("REST API kontrakt boʻyicha tayyor").
 - [x] **Step 5:** Commit `feat(api): auth, cases, invite, mediators, stats endpoints`, then push.
-- Note: SQLite has no JSONField `contains` lookup, so `/api/mediators/` filters specialties/languages in Python.
+- Note: SQLite has no JSONField `contains` lookup, so `/api/mediators/` filters areas/languages in Python.
 - Note: DRF has no `uz` locale, so its own 401 says "Authentication credentials were not provided." in English; our own errors are Uzbek.
 - Note: a leftover mock token (`mock-u-ariza`) would make TokenAuthentication answer 401 even on public views, so login, invite and mediators set `authentication_classes = []`.
 

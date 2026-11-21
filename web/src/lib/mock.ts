@@ -14,6 +14,7 @@ import statsFx from "@/fixtures/stats.json";
 import type {
   Agreement,
   AiInvite,
+  Area,
   AskAnswer,
   Brief,
   Case,
@@ -22,12 +23,14 @@ import type {
   Comparison,
   DisputeType,
   InvitePublic,
+  Lang,
   LoginResponse,
   Mediator,
   Meeting,
   RoomMessage,
   RoomParty,
   Position,
+  Procedure,
   Region,
   Stats,
   User,
@@ -47,11 +50,11 @@ export class MockError extends Error {
 const DEMO_USERS: Record<string, { password: string; user: User }> = {
   ariza: { password: "ariza123", user: { id: "u-ariza", name: "Aziz Karimov", role: "claimant" } },
   mediator: { password: "mediator123", user: { id: "u-mediator", name: "Dilnoza Rahimova", role: "mediator" } },
-  vazirlik: { password: "vazirlik123", user: { id: "u-vazirlik", name: "Adliya vazirligi", role: "ministry" } },
   admin: { password: "admin123", user: { id: "u-admin", name: "Administrator", role: "admin" } },
 };
 
-const STORE_KEY = "ma.mock.cases.v1";
+const STORE_KEY = "ma.mock.cases.v4"; // v4: procedure agreement, term, termination, signatories
+const USERS_KEY = "ma.mock.users.v1";
 const mediators = mediatorsFx as Mediator[];
 
 function load(): Case[] {
@@ -72,6 +75,184 @@ function save(cases: Case[]) {
   }
 }
 
+type MockAccount = { password: string; user: User };
+
+function loadUsers(): Record<string, MockAccount> {
+  try {
+    return JSON.parse(window.localStorage.getItem(USERS_KEY) ?? "{}") as Record<string, MockAccount>;
+  } catch {
+    return {};
+  }
+}
+
+const COMMISSION_RATE = 0.1; // same as backend cases.models.COMMISSION_RATE
+
+function payment(fee: number): Case["payment"] {
+  const commission = Math.round(fee * COMMISSION_RATE);
+  return { fee_uzs: fee, commission_uzs: commission, mediator_payout_uzs: fee - commission, claimant_share_uzs: fee - Math.floor(fee / 2), respondent_share_uzs: Math.floor(fee / 2), claimant_paid_at: null, respondent_paid_at: null, status: "pending" };
+}
+
+function event(c: Case, kind: string, label: string) {
+  c.events = [...c.events, { kind, label, at: now() }];
+  c.updated_at = now();
+}
+
+// ---------- the procedure under the Law (mirror of backend cases/procedure.py) ----------
+
+const TERM_DAYS = 30;
+const LANG_NAME: Record<string, string> = { uz: "oʻzbek", ru: "rus", en: "ingliz", kaa: "qoraqalpoq", tr: "turk", tg: "tojik", kk: "qozoq", ky: "qirgʻiz", tk: "turkman" };
+const ddmmyyyy = (iso: string) => new Date(iso).toLocaleDateString("ru-RU", { timeZone: "Asia/Tashkent" });
+
+function mockTerms(c: Case, m: Mediator, language: Lang, start: string): Procedure {
+  const fee = m.price_uzs;
+  const deadline = new Date(new Date(start).getTime() + TERM_DAYS * 86_400_000).toISOString();
+  const subject = c.classification?.summary || c.description;
+  const amount = c.amount_uzs ? `, ${som(c.amount_uzs)}` : "";
+  const clauses: [string, string][] = [
+    ["1. Taraflar", `Murojaatchi: ${c.claimant.name}. Ikkinchi tomon: ${c.respondent.name || "—"}. Taraflar mediatsiyada shaxsan yoki vakili orqali ishtirok etadi (10-modda).`],
+    ["2. Nizo predmeti", `${DISPUTE_LABEL[c.dispute_type]}${amount}: ${subject.slice(0, 400)}`],
+    ["3. Mediator", `${m.name}, Adliya vazirligi Mediatorlar reyestri № ${m.registry_no}. Mediator mustaqil va xolis; mustaqilligiga taʼsir qiluvchi holat yuzaga kelsa, bu haqda taraflarga aytadi va mediatsiyadan voz kechadi (9, 13-moddalar).`],
+    ["4. Tartib-taomil tartibi", "Mediator taraflar bilan birgalikda va har biri bilan alohida uchrashuvlar oʻtkazadi, ogʻzaki va yozma tavsiyalar beradi (13-modda). Muloqot Murosa platformasidagi maxfiy suhbat va uchrashuvlar orqali olib boriladi. Yarashishga majburlash taqiqlanadi (7-modda)."],
+    ["5. Til va joy", `Mediatsiya ${LANG_NAME[language] ?? language} tilida oʻtkaziladi. Joy: onlayn, Murosa platformasi; yuzma-yuz uchrashuv kelishilsa, mediator manzili: ${m.address || "kelishiladi"}.`],
+    ["6. Sana va muddat", `Mediatsiya ${ddmmyyyy(start)} kuni, ushbu kelishuv tuzilgan kundan boshlanadi (19-modda) va ${ddmmyyyy(deadline)} gacha (${TERM_DAYS} kun) tugallanishi kerak. Taraflarning oʻzaro roziligi bilan muddat bir marta ${TERM_DAYS} kungacha uzaytirilishi mumkin; muddat oʻtsa, mediatsiya tugatiladi (23, 24-moddalar). Mediatsiya davomida daʼvo muddatining oʻtishi toʻxtatib turiladi (21-modda).`],
+    ["7. Taraflarning huquqlari", "Har bir taraf mediatordan va mediatsiyaning istalgan bosqichida unda ishtirok etishdan voz kechishga haqli (7, 11-moddalar). Mediativ kelishuvga erishilsa, u yozma shaklda tuziladi, taraflar imzolaydi va mediator tasdiqlaydi; u majburiy kuchga ega, ixtiyoriy bajarilmasa sudga murojaat qilinadi (29, 29¹-moddalar)."],
+    ["8. Maxfiylik", "Mediatsiya davomida maʼlum boʻlgan maʼlumotlar uni bergan tarafning yozma roziligisiz oshkor qilinmaydi. Mediator bir tarafdan olgan maʼlumotni ikkinchi tarafga faqat uning roziligi bilan aytadi (6, 26, 27-moddalar)."],
+    ["9. Xarajatlar", `Mediator haqi ${som(fee)}; taraflar teng ulushda, ${som(fee - Math.floor(fee / 2))} va ${som(Math.floor(fee / 2))} dan toʻlaydi (28-modda). Pul Murosa platformasi hisobida saqlanadi; mediativ kelishuv tuzilgach, ${COMMISSION_RATE * 100} % platforma xizmat haqi ushlab qolinib, qolgani mediatorga oʻtkaziladi. Mediator mediatsiyani rad etsa yoki taraf mediatordan voz kechsa, toʻlangan pul toʻliq qaytariladi. Mediatsiya kelishuvsiz tugatilsa: ikkala ulush toʻlangan va kamida bitta uchrashuv oʻtkazilgan boʻlsa, haq mediatorga oʻtkaziladi, aks holda toʻliq qaytariladi.`],
+  ];
+  return {
+    title: `Mediatsiya tartib-taomilini amalga oshirish toʻgʻrisidagi kelishuv № ${c.code}`,
+    language,
+    started_at: start,
+    deadline,
+    clauses: clauses.map(([title, body]) => ({ title, body })),
+    note: "Taraflar ushbu kelishuvga platformada elektron rozilik bildirgan: murojaatchi mediatorni taklif qilib, ikkinchi tomon uni tasdiqlab.",
+  };
+}
+
+function clearProcedure(c: Case) {
+  Object.assign(c, { procedure: null, procedure_deadline: null, extension_requested_by: "", extended: false });
+}
+
+const TERMINATED_LABEL: Record<string, string> = {
+  claimant: "Murojaatchi mediatsiyani tugatdi",
+  respondent: "Ikkinchi tomon mediatsiyani tugatdi",
+  mediator: "Mediator: kelishuvga erishish imkoni yoʻq, mediatsiya tugatildi",
+  expired: "Mediatsiya muddati oʻtdi, mediatsiya tugatildi (23, 24-moddalar)",
+};
+const CAN_TERMINATE: Record<string, CaseStatus[]> = {
+  claimant: ["new", "invited", "accepted", "scheduled"],
+  respondent: ["accepted", "scheduled"],
+  mediator: ["scheduled"],
+};
+
+/** Art. 7, 24 and clause 9 of the procedure agreement. */
+function terminateCase(c: Case, by: string, reason = "") {
+  if (by !== "expired" && !CAN_TERMINATE[by].includes(c.status)) throw new MockError(400, "Bu bosqichda mediatsiyani tugatib boʻlmaydi");
+  const p = c.payment;
+  const paidAny = !!(p?.claimant_paid_at || p?.respondent_paid_at);
+  const held = loadRooms().meetings.some((m) => m.caseId === c.id && m.status === "accepted" && new Date(m.start).getTime() < Date.now());
+  const keep = !!(p?.claimant_paid_at && p?.respondent_paid_at) && held;
+  if (paidAny && !keep) c.payment = null;
+  if (keep && p) p.status = "released";
+  if (c.procedure?.draft) c.procedure = null; // an unconfirmed proposal never became an agreement
+  Object.assign(c, { proposed_mediator: null, proposed_session_at: null, extension_requested_by: "", termination_reason: reason.slice(0, 300), status: "terminated" });
+  event(c, `terminated_${by}`, TERMINATED_LABEL[by]);
+  if (paidAny) event(c, keep ? "paid_out" : "refunded", keep ? "Uchrashuv oʻtkazilgani uchun mediator haqi mediatorga oʻtkazildi" : "Toʻlangan mediator haqi tomonlarga qaytarildi");
+}
+
+function expireDue(cases: Case[]): boolean {
+  let changed = false;
+  for (const c of cases) {
+    if (c.status === "scheduled" && c.procedure_deadline && new Date(c.procedure_deadline).getTime() < Date.now()) {
+      terminateCase(c, "expired");
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+/** Art. 23: one party asks, the other agrees; once, by 30 days. */
+function extendTerm(c: Case, party: RoomParty) {
+  if (c.status !== "scheduled" || !c.procedure_deadline) throw new MockError(400, "Muddatni faqat mediatsiya davomida uzaytirish mumkin");
+  if (c.extended) throw new MockError(400, "Muddat allaqachon bir marta uzaytirilgan");
+  if (c.extension_requested_by === party) throw new MockError(400, "Siz allaqachon soʻragansiz, ikkinchi tomon roziligi kutilmoqda");
+  if (c.extension_requested_by) {
+    c.procedure_deadline = new Date(new Date(c.procedure_deadline).getTime() + TERM_DAYS * 86_400_000).toISOString();
+    Object.assign(c, { extended: true, extension_requested_by: "" });
+    if (c.procedure) c.procedure = { ...c.procedure, deadline: c.procedure_deadline, extended: true };
+    event(c, "extended", "Taraflar roziligi bilan muddat 30 kunga uzaytirildi (23-modda)");
+  } else {
+    c.extension_requested_by = party;
+    event(c, `extension_requested_${party}`, party === "claimant" ? "Murojaatchi muddatni 30 kunga uzaytirishni soʻradi" : "Ikkinchi tomon muddatni 30 kunga uzaytirishni soʻradi");
+  }
+}
+
+/** Art. 8, 22: the respondent confirms or rejects the claimant's proposed mediator. */
+function answerProposal(c: Case, mediatorId: string, accept: boolean) {
+  if (c.status !== "accepted" || !c.proposed_mediator) throw new MockError(400, "Tasdiqlanadigan mediator taklifi yoʻq");
+  if (c.proposed_mediator.id !== mediatorId) throw new MockError(409, "Mediator taklifi oʻzgardi, sahifani yangilang");
+  if (accept) {
+    c.mediator = c.proposed_mediator;
+    c.session_at = c.proposed_session_at;
+    c.payment = payment(c.mediator.price_uzs);
+    c.procedure = mockTerms(c, c.mediator, c.procedure?.language ?? "uz", now());
+    c.procedure_deadline = c.procedure.deadline;
+    Object.assign(c, { extension_requested_by: "", extended: false });
+    c.proposed_mediator = null;
+    c.proposed_session_at = null;
+    setStatus(c, "scheduled");
+  } else {
+    c.proposed_mediator = null;
+    c.proposed_session_at = null;
+    c.procedure = null;
+    event(c, "mediator_rejected", "Ikkinchi tomon taklif qilingan mediatorni rad etdi");
+  }
+}
+
+/** Art. 11: a party refuses the mediator: refund, wipe the room (Art. 6, 27), back to "accepted". */
+function dropMediator(c: Case, party: RoomParty | "mediator") {
+  if (c.status !== "scheduled" || !c.mediator) throw new MockError(400, "Mediatordan faqat kelishuv imzolanguncha voz kechish mumkin");
+  const paid = !!(c.payment?.claimant_paid_at || c.payment?.respondent_paid_at);
+  const r = loadRooms();
+  r.messages = r.messages.filter((m) => m.caseId !== c.id);
+  r.meetings = r.meetings.filter((m) => m.caseId !== c.id);
+  delete r.approvals[c.id];
+  saveRooms(r);
+  Object.assign(c, { mediator: null, session_at: null, payment: null, brief: null, agreement: null, status: "accepted" });
+  clearProcedure(c);
+  c.signatories = { claimant: null, respondent: null };
+  event(c, `mediator_dropped_${party}`, { claimant: "Murojaatchi mediatordan voz kechdi", respondent: "Ikkinchi tomon mediatordan voz kechdi", mediator: "Mediator ishni rad etdi (9, 13-moddalar)" }[party]);
+  if (paid) event(c, "refunded", "Toʻlangan mediator haqi tomonlarga qaytarildi");
+}
+
+function payShare(c: Case, party: RoomParty) {
+  const p = c.payment;
+  if (!p || c.status !== "scheduled") throw new MockError(400, "Toʻlov faqat mediatsiya davomida qabul qilinadi");
+  const key = party === "claimant" ? "claimant_paid_at" : "respondent_paid_at";
+  if (p[key]) throw new MockError(400, "Bu ulush allaqachon toʻlangan");
+  p[key] = now();
+  if (p.claimant_paid_at && p.respondent_paid_at) p.status = "held"; // paying is only possible while scheduled
+  c.events = [...c.events, { kind: `paid_${party}`, label: party === "claimant" ? "Murojaatchi mediator haqining ulushini toʻladi" : "Ikkinchi tomon mediator haqining ulushini toʻladi", at: now() }];
+  c.updated_at = now();
+}
+
+const PHONES_KEY = "ma.mock.phones.v1";
+const phoneKey = (s: string) => s.replace(/\D/g, "").slice(-9);
+function loadPhones(): Record<string, string> {
+  try {
+    return JSON.parse(window.localStorage.getItem(PHONES_KEY) ?? "{}") as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+function savePhones(p: Record<string, string>) {
+  try {
+    window.localStorage.setItem(PHONES_KEY, JSON.stringify(p));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function resetMock() {
   try {
     window.localStorage.removeItem(STORE_KEY);
@@ -86,9 +267,10 @@ const EVENT_LABEL: Record<CaseStatus, string> = {
   invited: "Ikkinchi tomonga taklif yuborildi",
   accepted: "Ikkinchi tomon rozi boʻldi",
   declined: "Ikkinchi tomon rad etdi",
-  scheduled: "Mediator bilan sessiya belgilandi",
+  scheduled: "Ikkinchi tomon mediatorni tasdiqladi, sessiya belgilandi",
   agreed: "Kelishuvga erishildi",
   closed: "Ish yopildi",
+  terminated: "Mediatsiya tugatildi",
 };
 
 function now() {
@@ -98,6 +280,7 @@ function now() {
 function setStatus(c: Case, status: CaseStatus) {
   if (c.status === status) return;
   c.status = status;
+  if (status === "agreed" && c.payment?.status === "held") c.payment.status = "released";
   c.events = [...c.events, { kind: status, label: EVENT_LABEL[status], at: now() }];
 }
 
@@ -115,11 +298,14 @@ const CYR: Record<string, string> = {
   щ: "sh", ъ: "ʼ", ы: "i", ь: "", э: "e", ю: "yu", я: "ya", ў: "oʻ", қ: "q", ғ: "gʻ", ҳ: "h",
 };
 
+// The new Uzbek alphabet maps back to the classic spelling the keyword rules use.
+const YANGI_BACK: Record<string, string> = { ş: "sh", ç: "ch", ğ: "gʻ", ö: "oʻ" };
+
 export function normalize(s: string): string {
   return s
     .toLowerCase()
     .split("")
-    .map((ch) => CYR[ch] ?? ch)
+    .map((ch) => CYR[ch] ?? YANGI_BACK[ch] ?? ch)
     .join("")
     .replace(/['‘’`ʼ]/g, "ʻ");
 }
@@ -208,7 +394,7 @@ function mockPosition(answers: { q: string; a: string }[]): Position {
 type RoomsStore = {
   messages: (RoomMessage & { caseId: string; readM: boolean; readP: boolean })[];
   meetings: (Meeting & { caseId: string })[];
-  approvals: Record<string, Partial<Record<RoomParty, { decision: "approved" | "changes"; comment: string; at: string; hash: string }>>>;
+  approvals: Record<string, Partial<Record<RoomParty, { decision: "approved" | "changes"; comment: string; at: string; hash: string; full_name?: string; address?: string }>>>;
 };
 const ROOMS_KEY = "ma.mock.rooms.v1";
 
@@ -238,7 +424,7 @@ function approvalsOf(r: RoomsStore, c: Case) {
   const a = r.approvals[c.id] ?? {};
   const one = (p: RoomParty) => {
     const x = a[p];
-    return x ? { decision: x.decision, comment: x.comment, at: x.at, current: !!h && x.hash === h } : null;
+    return x ? { decision: x.decision, comment: x.comment, at: x.at, current: !!h && x.hash === h, full_name: x.full_name ?? "", address: x.address ?? "" } : null;
   };
   return { claimant: one("claimant"), respondent: one("respondent") };
 }
@@ -269,6 +455,15 @@ function roomOf(c: Case, viewer: "mediator" | RoomParty) {
     agreement: c.agreement,
     agreement_hash: agreementHash(c.agreement),
     approvals: approvalsOf(r, c),
+    payment: c.payment,
+    proposed_mediator: c.proposed_mediator,
+    proposed_session_at: c.proposed_session_at,
+    procedure: c.procedure,
+    procedure_deadline: c.procedure_deadline,
+    extended: c.extended,
+    extension_requested_by: c.extension_requested_by,
+    termination_reason: c.termination_reason,
+    signatories: c.signatories,
   };
 }
 
@@ -338,10 +533,15 @@ function roomRoute(method: string, rest: string, c: Case, viewer: "mediator" | R
   if (rest === "approve/") {
     if (viewer === "mediator") throw new MockError(403, "Kelishuvni faqat tomonlar tasdiqlaydi");
     if (!c.agreement) throw new MockError(400, "Kelishuv loyihasi hali yoʻq");
+    const fullName = String(body.full_name ?? "").split(/\s+/).filter(Boolean).join(" ");
+    const address = String(body.address ?? "").trim();
+    if (body.decision === "approved" && (fullName.split(" ").length < 3 || address.length < 10))
+      throw new MockError(400, "Familiya, ism, otasining ismi va yashash joyi (pochta manzili) kerak (29-modda)");
     r.approvals[c.id] = {
       ...(r.approvals[c.id] ?? {}),
-      [viewer]: { decision: body.decision as "approved", comment: String(body.comment ?? ""), at: now(), hash: agreementHash(c.agreement) },
+      [viewer]: { decision: body.decision as "approved", comment: String(body.comment ?? ""), at: now(), hash: agreementHash(c.agreement), full_name: fullName, address },
     };
+    c.signatories = { ...c.signatories, [viewer]: body.decision === "approved" ? { full_name: fullName, address } : null };
     r.messages.push({
       id: uid(),
       caseId: c.id,
@@ -365,7 +565,7 @@ type Req = { method: string; path: string; body?: unknown; user: User | null };
 function byRole(cases: Case[], user: User | null): Case[] {
   if (!user) return [];
   if (user.role === "claimant") return cases.filter((c) => c.claimant.id === user.id);
-  if (user.role === "mediator") return cases.filter((c) => c.mediator?.id === "m-01");
+  if (user.role === "mediator") return user.id === "u-mediator" ? cases.filter((c) => c.mediator?.id === "m-01") : [];
   return cases;
 }
 
@@ -378,47 +578,120 @@ export async function mockRoute<T>({ method, path, body, user }: Req): Promise<T
 
   if (p === "/health") return ok({ ok: true, ai: false });
 
+  if (p === "/auth/register/" || p === "/auth/register") {
+    const username = String(b.username ?? "").trim();
+    const key = username.toLowerCase();
+    const role = b.role === "mediator" ? "mediator" : "claimant"; // never admin
+    if (!/^[A-Za-z0-9_.]{3,30}$/.test(username) || String(b.password ?? "").length < 6 || String(b.full_name ?? "").trim().length < 3)
+      throw new MockError(400, "Tekshiring: login, parol (kamida 6 belgi), F.I.Sh.");
+    const users = loadUsers();
+    if (DEMO_USERS[key] || users[key]) throw new MockError(400, "Bu login band, boshqasini tanlang");
+    const account = { password: String(b.password), user: { id: `u-${key}`, name: String(b.full_name).trim(), role, pending: role === "mediator" } satisfies User };
+    users[key] = account;
+    savePhones({ ...loadPhones(), [account.user.id]: String(b.phone ?? "").trim() });
+    try {
+      window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    } catch {
+      /* ignore */
+    }
+    return ok({ token: `mock-${account.user.id}`, user: account.user } satisfies LoginResponse);
+  }
   if (p === "/auth/login/" || p === "/auth/login") {
-    const u = DEMO_USERS[String(b.username ?? "").trim().toLowerCase()];
+    const name = String(b.username ?? "").trim().toLowerCase();
+    const u = DEMO_USERS[name] ?? loadUsers()[name];
     if (!u || u.password !== b.password) throw new MockError(400, "Login yoki parol notoʻgʻri");
     return ok({ token: `mock-${u.user.id}`, user: u.user } satisfies LoginResponse);
   }
   if (p === "/auth/me/" || p === "/auth/me") {
     if (!user) throw new MockError(401, "Avval tizimga kiring");
-    return ok(user);
+    const phones = loadPhones();
+    if (method === "PATCH") {
+      const phone = String(b.phone ?? "").trim();
+      if (!/^\+?[0-9 ()-]{9,20}$/.test(phone)) throw new MockError(400, "Telefon raqamini toʻgʻri kiriting");
+      phones[user.id] = phone;
+      savePhones(phones);
+    }
+    return ok({ ...user, phone: phones[user.id] ?? (user.id === "u-ariza" ? "+998901234567" : "") });
   }
 
   if (p === "/mediators/") {
-    const type = query.get("dispute_type");
+    const area = query.get("area");
     const region = query.get("region");
     const lang = query.get("lang");
-    return ok(
-      mediators
-        .filter((m) => (!type || m.specialties.includes(type as DisputeType)) && (!region || m.region === region) && (!lang || m.languages.includes(lang as "uz")))
-        .sort((a, c) => c.rating - a.rating),
-    );
+    const text = (query.get("q") ?? "").trim().toLowerCase();
+    const rows = mediators
+      .filter((m) => (!area || m.areas.includes(area as Area)) && (!region || m.region === region) && (!lang || m.languages.includes(lang as Lang)))
+      .filter((m) => !text || `${m.name} ${m.registry_no}`.toLowerCase().includes(text))
+      .sort((a, c) => c.rating - a.rating || c.resolved - a.resolved);
+    if (!query.get("page")) return ok(rows);
+    const size = Math.min(Math.max(Number(query.get("page_size")) || 10, 1), 50);
+    const pages = Math.max(Math.ceil(rows.length / size), 1);
+    const page = Math.min(Math.max(Number(query.get("page")) || 1, 1), pages);
+    return ok({ count: rows.length, page, pages, results: rows.slice((page - 1) * size, page * size) });
   }
 
   if (p === "/stats/") return ok(statsFx as Stats);
 
   if (p.startsWith("/rooms/")) {
     const all = load();
+    if (expireDue(all)) save(all);
     const t = p.match(/^\/rooms\/t\/([^/]+)\/(.*)$/);
     if (t) {
       const c = all.find((x) => x.invite_token === t[1]);
       if (!c) throw new MockError(404, "Taklif topilmadi yoki muddati oʻtgan");
-      return ok(roomRoute(method, t[2], c, "respondent", b, query));
+      if (["pay/", "mediator/", "drop-mediator/", "terminate/", "extend/"].includes(t[2])) {
+        if (t[2] === "pay/") payShare(c, "respondent");
+        else if (t[2] === "mediator/") answerProposal(c, String(b.mediator_id ?? ""), !!b.accept);
+        else if (t[2] === "terminate/") terminateCase(c, "respondent", String(b.reason ?? ""));
+        else if (t[2] === "extend/") extendTerm(c, "respondent");
+        else dropMediator(c, "respondent");
+        save(all);
+        return ok(roomOf(c, "respondent"));
+      }
+      if (method !== "GET" && c.status === "terminated") throw new MockError(403, "Mediatsiya tugatilgan");
+      const res = roomRoute(method, t[2], c, "respondent", b, query);
+      if (method !== "GET") save(all);
+      return ok(res);
     }
     const mt = p.match(/^\/rooms\/meetings\/([^/]+)\/$/);
     const caseId = mt ? loadRooms().meetings.find((m) => m.id === mt[1])?.caseId : p.split("/")[2];
     const c = all.find((x) => x.id === caseId);
     if (!c || !user) throw new MockError(404, "Ish topilmadi");
     const viewer = user.role === "mediator" || user.role === "admin" ? "mediator" : "claimant";
-    return ok(roomRoute(method, mt ? `meetings/${mt[1]}/` : p.split("/").slice(3).join("/"), c, viewer, b, query));
+    const rest = mt ? `meetings/${mt[1]}/` : p.split("/").slice(3).join("/");
+    if (rest === "terminate/" || rest === "refuse/" || rest === "extend/") {
+      if (rest === "refuse/") {
+        if (viewer !== "mediator") throw new MockError(403, "Faqat ishning mediatori");
+        dropMediator(c, "mediator");
+        save(all);
+        return ok({ ok: true });
+      }
+      if (rest === "extend/") {
+        if (viewer !== "claimant") throw new MockError(403, "Muddatni taraflar uzaytiradi");
+        extendTerm(c, "claimant");
+      } else terminateCase(c, viewer, String(b.reason ?? ""));
+      save(all);
+      return ok(roomOf(c, viewer));
+    }
+    if (method !== "GET" && c.status === "terminated" && !mt) throw new MockError(403, "Mediatsiya tugatilgan");
+    const res = roomRoute(method, rest, c, viewer, b, query);
+    if (method !== "GET") save(all);
+    return ok(res);
   }
 
   const cases = load();
+  if (expireDue(cases)) save(cases);
 
+  if (p === "/my-invites/") {
+    if (!user) throw new MockError(401, "Avval tizimga kiring");
+    const key = phoneKey(loadPhones()[user.id] ?? "");
+    if (key.length < 9) return ok([]);
+    return ok(
+      cases
+        .filter((c) => c.claimant.id !== user.id && phoneKey(c.respondent.phone) === key)
+        .map((c) => ({ code: c.code, claimant_name: c.claimant.name, dispute_type: c.dispute_type, status: c.status, invite_token: c.invite_token, created_at: c.created_at })),
+    );
+  }
   if (p === "/cases/" && method === "GET") return ok(byRole(cases, user).sort((a, c) => c.created_at.localeCompare(a.created_at)));
   if (p === "/cases/" && method === "POST") {
     if (!user) throw new MockError(401, "Avval tizimga kiring");
@@ -446,6 +719,16 @@ export async function mockRoute<T>({ method, path, body, user }: Req): Promise<T
       session_at: null,
       agreement: null,
       agreed_at: null,
+      review: null,
+      payment: null,
+      proposed_mediator: null,
+      proposed_session_at: null,
+      procedure: null,
+      procedure_deadline: null,
+      extended: false,
+      extension_requested_by: "",
+      termination_reason: "",
+      signatories: { claimant: null, respondent: null },
       events: [{ kind: "created", label: EVENT_LABEL.new, at: t }],
       created_at: t,
       updated_at: t,
@@ -455,16 +738,37 @@ export async function mockRoute<T>({ method, path, body, user }: Req): Promise<T
     return ok(c);
   }
 
-  const caseMatch = p.match(/^\/cases\/([^/]+)\/(book\/)?$/);
+  const caseMatch = p.match(/^\/cases\/([^/]+)\/(book\/|pay\/|review\/|drop-mediator\/)?$/);
   if (caseMatch) {
     const c = cases.find((x) => x.id === caseMatch[1]);
     if (!c) throw new MockError(404, "Ish topilmadi");
-    if (caseMatch[2]) {
-      c.mediator = mediators.find((m) => m.id === b.mediator_id) ?? mediators[0];
-      c.session_at = String(b.session_at ?? now());
-      setStatus(c, "scheduled");
+    if (caseMatch[2] === "pay/") {
+      payShare(c, "claimant");
+    } else if (caseMatch[2] === "drop-mediator/") {
+      dropMediator(c, "claimant");
+    } else if (caseMatch[2] === "review/") {
+      const stars = Number(b.stars);
+      if (!c.mediator || (c.status !== "agreed" && c.status !== "closed")) throw new MockError(400, "Baho faqat ish yakunlangandan keyin qoʻyiladi");
+      if (c.review) throw new MockError(400, "Bu ish uchun baho allaqachon qoʻyilgan");
+      if (!Number.isInteger(stars) || stars < 0 || stars > 5) throw new MockError(400, "Notoʻgʻri maʼlumot: stars");
+      c.review = { stars, comment: String(b.comment ?? "").trim(), at: now() };
+      const m = c.mediator;
+      m.rating = Math.round(((m.rating * m.reviews + stars) / (m.reviews + 1)) * 100) / 100;
+      m.reviews += 1;
+      c.events = [...c.events, { kind: "reviewed", label: "Murojaatchi mediatorni baholadi", at: now() }];
+    } else if (caseMatch[2]) {
+      if (c.status !== "accepted") throw new MockError(400, "Mediatorni ikkinchi tomon rozi boʻlgandan keyin taklif qilish mumkin");
+      const m = mediators.find((x) => x.id === b.mediator_id);
+      if (!m) throw new MockError(404, "Bu mediator hozir mavjud emas");
+      const lang = (String(b.language || "") || (m.languages.includes("uz") ? "uz" : m.languages[0])) as Lang;
+      if (!m.languages.includes(lang)) throw new MockError(400, "Mediator bu tilda mediatsiya oʻtkazmaydi");
+      c.proposed_mediator = m;
+      c.proposed_session_at = String(b.session_at ?? now());
+      c.procedure = { ...mockTerms(c, m, lang, now()), draft: true };
+      event(c, "mediator_proposed", "Murojaatchi mediatorni taklif qildi");
     } else if (method === "PATCH") {
       const { status, ...rest } = b as Partial<Case>;
+      if (status === "agreed" && c.status !== "scheduled") throw new MockError(400, "Kelishuvni faqat mediatsiya davom etayotganda muhrlash mumkin");
       if (status === "agreed" && !mockBothApproved({ ...c, ...rest } as Case)) throw new MockError(400, "Ikkala tomon kelishuv loyihasini tasdiqlamagan");
       Object.assign(c, rest);
       if (status) setStatus(c, status);

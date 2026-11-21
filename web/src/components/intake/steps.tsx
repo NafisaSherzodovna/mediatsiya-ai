@@ -27,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import { SAMPLE_DISPUTES } from "@/lib/demo";
 import { som } from "@/lib/format";
 import { DISPUTE_LABEL, DISPUTE_TYPES, REGION_LABEL, REGIONS } from "@/lib/labels";
+import { toYangi } from "@/lib/yangi";
 import type { Case, Classification, Comparison, DisputeType, Region } from "@/lib/types";
 import { VoiceButton } from "./voice-button";
 
@@ -73,7 +74,7 @@ export function DescribeStep({
 }: {
   text: string;
   setText: (t: string) => void;
-  region: Region;
+  region: Region | "";
   setRegion: (r: Region) => void;
   onNext: () => void;
 }) {
@@ -120,8 +121,12 @@ export function DescribeStep({
           id="region"
           value={region}
           onChange={(e) => setRegion(e.target.value as Region)}
-          className="h-11 w-full rounded-xl border border-input bg-white px-3 text-ink"
+          className="h-11 w-full rounded-xl border border-input bg-white px-3 text-ink invalid:text-ink-soft"
+          required
         >
+          <option value="" disabled>
+            Hududni tanlang
+          </option>
           {REGIONS.map((r) => (
             <option key={r} value={r}>
               {REGION_LABEL[r]}
@@ -131,8 +136,8 @@ export function DescribeStep({
       </div>
 
       <div className="mt-8 flex justify-end">
-        <Button size="lg" variant="accord" disabled={left > 0} onClick={onNext}>
-          AI tahliliga yuborish <Sparkles className="size-4" />
+        <Button size="lg" variant="accord" disabled={left > 0 || !region} onClick={onNext}>
+          Keyingisi <ArrowRight className="size-4" />
         </Button>
       </div>
     </div>
@@ -424,7 +429,7 @@ export function InviteStep({
 // ---------------- 6. Sent ----------------
 
 export function SentStep({ item, link }: { item: Case; link: string }) {
-  const tg = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(item.invite_text)}`;
+  const tg = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(toYangi(item.invite_text))}`;
   return (
     <div className="text-center">
       <div className="relative flex justify-center">

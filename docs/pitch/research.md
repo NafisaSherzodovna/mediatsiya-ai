@@ -18,7 +18,7 @@ Hakamlarga koʻrsatiladigan har bir raqam shu yerda manbasi bilan turadi. Manbas
 | Fakt va qiymat | Manba | Tekshirilgan sana |
 |---|---|---|
 | **29¹-modda (OʻRQ-1089, 20.10.2025):** mediativ kelishuv taraflar uchun majburiy kuchga ega; ixtiyoriy bajarilmasa, majburiy ijro uchun sudga murojaat qilish mumkin. Ilgari "tekshirish kerak" deb belgilangan daʼvo **tasdiqlandi** | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
-| **9¹-modda:** Adliya vazirligi mediatsiya sohasidagi vakolatli davlat organi; mediatorlar tomonidan **statistika maʼlumotlarini taqdim etish tartibini belgilaydi va tahlil qiladi**. Vazirlik paneli aynan shu vakolatga xizmat qiladi | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
+| **9¹-modda:** Adliya vazirligi mediatsiya sohasidagi vakolatli davlat organi; mediatorlar tomonidan **statistika maʼlumotlarini taqdim etish tartibini belgilaydi va tahlil qiladi**. Bosh sahifadagi ochiq statistika aynan shu vakolatga xizmat qiladi | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
 | **12¹-modda:** reyestrga kirish uchun oliy maʼlumot, maxsus oʻquv kursi va malaka imtihoni; advokat va notariuslar imtihondan ozod | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
 | **28-modda:** mediator faoliyati haq evaziga yoki tekin boʻlishi mumkin | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |
 | **29-modda:** kelishuvda taraflar, huquq-majburiyatlar, bajarish shartlari va muddatlari boʻlishi shart; taraflar imzolaydi, mediator tasdiqlaydi. AI kelishuv loyihasi shu talablarga mos tuziladi | [lex.uz/docs/-3805227](https://lex.uz/docs/-3805227) | 2026-11-20 |

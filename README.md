@@ -1,4 +1,4 @@
-# Mediatsiya AI
+# Murosa
 
 AI yordamida onlayn mediatsiya platformasi: nizoni sudga bormasdan, mediator yordamida hal qilish.
 Adliya vazirligi xakatoni uchun loyiha.

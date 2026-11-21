@@ -1,8 +1,8 @@
 // Copied from contract/api.md. Additive changes only, via a [contract] commit.
 
 export type DisputeType = "qarz" | "ijara" | "oilaviy" | "istemolchi" | "mehnat" | "qoshnichilik" | "boshqa";
-export type CaseStatus = "new" | "invited" | "accepted" | "declined" | "scheduled" | "agreed" | "closed";
-export type Role = "claimant" | "mediator" | "ministry" | "admin";
+export type CaseStatus = "new" | "invited" | "accepted" | "declined" | "scheduled" | "agreed" | "closed" | "terminated";
+export type Role = "claimant" | "mediator" | "admin";
 export type Region =
   | "toshkent-sh"
   | "toshkent-v"
@@ -19,6 +19,8 @@ export type Region =
   | "xorazm"
   | "qoraqalpogiston";
 export type AiSource = "ai" | "fallback";
+export type Area = "fuqarolik" | "tadbirkorlik" | "bank" | "sugurta" | "mehnat" | "oilaviy";
+export type Lang = "uz" | "ru" | "en" | "kaa" | "tr" | "tg" | "kk" | "ky" | "tk";
 
 export type Classification = {
   dispute_type: DisputeType;
@@ -61,8 +63,14 @@ export type Mediator = {
   name: string;
   photo: string;
   registry_no: string;
-  specialties: DisputeType[];
-  languages: ("uz" | "ru" | "en")[];
+  registry_date: string | null;
+  areas: Area[];
+  languages: Lang[];
+  address: string;
+  phone: string;
+  email: string;
+  certificate_no: string;
+  certificate_date: string | null;
   region: Region;
   price_uzs: number;
   rating: number;
@@ -70,7 +78,10 @@ export type Mediator = {
   years: number;
   bio: string;
   is_demo: boolean;
+  resolved: number;
+  reviews: number;
 };
+export type MediatorPage = { count: number; page: number; pages: number; results: Mediator[] };
 export type CaseEvent = { kind: string; label: string; at: string };
 export type Case = {
   id: string;
@@ -96,8 +107,42 @@ export type Case = {
   events: CaseEvent[];
   created_at: string;
   updated_at: string;
+  review: Review | null;
+  payment: Payment | null;
+  proposed_mediator: Mediator | null;
+  proposed_session_at: string | null;
+} & ProcedureState;
+/** Art. 19, 20, 23, 24, 29: the procedure agreement, its term, why it ended, and who signed the agreement. */
+export type ProcedureState = {
+  procedure: Procedure | null;
+  procedure_deadline: string | null;
+  extended: boolean;
+  extension_requested_by: "" | RoomParty;
+  termination_reason: string;
+  signatories: Record<RoomParty, { full_name: string; address: string } | null>;
 };
-export type User = { id: string; name: string; role: Role };
+export type Procedure = {
+  title: string;
+  language: Lang;
+  started_at: string;
+  deadline: string;
+  clauses: { title: string; body: string }[];
+  note: string;
+  draft?: true;
+  extended?: true;
+};
+export type Review = { stars: number; comment: string; at: string };
+export type Payment = {
+  fee_uzs: number;
+  commission_uzs: number;
+  mediator_payout_uzs: number;
+  claimant_share_uzs: number;
+  respondent_share_uzs: number;
+  claimant_paid_at: string | null;
+  respondent_paid_at: string | null;
+  status: "pending" | "held" | "released";
+};
+export type User = { id: string; name: string; role: Role; pending?: boolean };
 export type LoginResponse = { token: string; user: User };
 export type InvitePublic = {
   code: string;
@@ -107,6 +152,9 @@ export type InvitePublic = {
   invite_text: string;
   status: CaseStatus;
 };
+/** An invitation addressed to the signed-in user's phone (GET /api/my-invites/). */
+export type MyInvite = { code: string; claimant_name: string; dispute_type: DisputeType; status: CaseStatus; invite_token: string; created_at: string };
+export type Me = User & { phone: string };
 export type Stats = {
   totals: {
     cases: number;
@@ -137,7 +185,7 @@ export type Meeting = {
   note: string;
   status: MeetingStatus;
 };
-export type ApprovalState = { decision: "approved" | "changes"; comment: string; at: string; current: boolean } | null;
+export type ApprovalState = { decision: "approved" | "changes"; comment: string; at: string; current: boolean; full_name: string; address: string } | null;
 export type Room = {
   case_id: string;
   code: string;
@@ -150,4 +198,7 @@ export type Room = {
   agreement: Agreement | null;
   agreement_hash: string;
   approvals: Record<RoomParty, ApprovalState>;
-};
+  payment: Payment | null;
+  proposed_mediator: Mediator | null;
+  proposed_session_at: string | null;
+} & ProcedureState;

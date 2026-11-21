@@ -1,12 +1,11 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
-import { Clock, FileCheck2, Landmark, ShieldCheck, Users, Wallet } from "lucide-react";
+import { Activity, Clock, FileCheck2, ShieldCheck, Users, Wallet } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import useSWR from "swr";
-import { AppShell } from "@/components/shell/app-header";
 import { api } from "@/lib/api";
 import { monthUz, percent } from "@/lib/format";
 import { DISPUTE_LABEL, REGION_LABEL } from "@/lib/labels";
@@ -19,17 +18,10 @@ const C_REST = "#d5d9e2";
 const GRID = "#ece8de";
 const AXIS = "#55607a";
 
-export default function VazirlikPage() {
-  return (
-    <AppShell roles={["ministry", "admin"]} wide>
-      <Dashboard />
-    </AppShell>
-  );
-}
-
-function Dashboard() {
+/** Public live statistics for the landing page (aggregated, no personal data). */
+export function LiveStats() {
   const { data } = useSWR<Stats>("/stats/", (p: string) => api<Stats>(p), { refreshInterval: 10000 });
-  if (!data) return <div className="h-96 animate-pulse rounded-2xl bg-muted" />;
+  if (!data) return <div className="h-[640px] animate-pulse rounded-2xl bg-muted" />;
   const t = data.totals;
   const tiles = [
     { icon: FileCheck2, label: "Murojaatlar", value: t.cases, fmt: {} },
@@ -49,10 +41,10 @@ function Dashboard() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-accord uppercase">
-            <Landmark className="size-4" /> Vazirlik paneli
+            <Activity className="size-4" /> Ochiq statistika
           </p>
-          <h1 className="mt-1 text-[2rem] leading-tight font-semibold text-ink">Mediatsiya — jonli statistika</h1>
-          <p className="mt-1 text-ink-soft">2026-yil, barcha hududlar. Maʼlumotlar shaxsiylashtirilmagan.</p>
+          <h2 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Platforma raqamlarda — jonli</h2>
+          <p className="mt-2 text-ink-soft">2026-yil, barcha hududlar. Maʼlumotlar shaxsiylashtirilmagan, har 10 soniyada yangilanadi.</p>
         </div>
         <span className="rounded-full bg-warn-tint px-3 py-1 text-xs font-semibold text-[#7a4f12]">Demo maʼlumotlar</span>
       </div>
@@ -62,7 +54,8 @@ function Dashboard() {
           <motion.div
             key={s.label}
             initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
             transition={{ delay: i * 0.06 }}
             className={`sheet p-4 ${s.accent ? "bg-[linear-gradient(180deg,#fff,var(--accord-tint))]" : ""} ${i === 0 ? "col-span-2 lg:col-span-1" : ""}`}
           >

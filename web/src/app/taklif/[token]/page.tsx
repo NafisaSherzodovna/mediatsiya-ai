@@ -7,8 +7,8 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AiThinking } from "@/components/brand/ai-thinking";
 import { Avatar } from "@/components/brand/bits";
-import { Logo } from "@/components/brand/logo";
 import { RespondentRoom } from "@/components/room/respondent-room";
+import { AppHeader } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
 import { api, ApiError, errorText } from "@/lib/api";
 import { RESPONDENT_QUESTIONS, SAMPLE_RESPONDENT_ANSWERS, takeDemoPrefill } from "@/lib/demo";
@@ -88,10 +88,8 @@ export default function TaklifPage({ params }: { params: Promise<{ token: string
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <header className={`mx-auto flex h-16 w-full items-center px-4 ${phase === "closed" ? "max-w-4xl" : "max-w-xl"}`}>
-        <Logo />
-      </header>
-      <main className={`mx-auto w-full flex-1 px-4 pt-2 pb-16 ${phase === "closed" ? "max-w-4xl" : "max-w-xl"}`}>
+      <AppHeader />
+      <main className={`mx-auto w-full flex-1 px-4 pt-6 pb-16 ${phase === "closed" ? "max-w-4xl" : "max-w-xl"}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={phase === "q" ? `q${qi}` : phase}

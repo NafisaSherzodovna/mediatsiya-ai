@@ -7,15 +7,19 @@ from __future__ import annotations
 
 import json
 import random
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.db import transaction
 
 from accounts.models import Profile
-from cases.models import Case, CaseEvent
+from cases.models import Case, CaseEvent, Region
+from cases.procedure import terms
+from rooms.logic import agreement_hash
+from rooms.models import Approval
 from mediators.models import Mediator
 
 TZ = ZoneInfo("Asia/Tashkent")
@@ -68,8 +72,12 @@ def make_mediators(rng: random.Random) -> list[Mediator]:
     out = []
     for i, m in enumerate(fx("mediators.json")):
         out.append(Mediator(id=m["id"], user=med_user if m["id"] == "m-01" else None, name=m["name"], photo="", registry_no=m["registry_no"],
-                            specialties=m["specialties"], languages=m["languages"], region=m["region"], price_uzs=m["price_uzs"],
-                            rating=m["rating"], sessions=m["sessions"], years=m["years"], bio=m["bio"], is_demo=True))
+                            registry_date=date.fromisoformat(m["registry_date"]), areas=m["areas"], address=m["address"],
+                            phone=m["phone"], email=m["email"], certificate_no=m["certificate_no"],
+                            certificate_date=date.fromisoformat(m["certificate_date"]),
+                            languages=m["languages"], region=m["region"], price_uzs=m["price_uzs"],
+                            rating=m["rating"], sessions=m["sessions"], resolved=m["resolved"], reviews=m["reviews"], years=m["years"],
+                            bio=m["bio"], is_demo=True))
     types = [t for t, *_ in TYPES]
     regions = [r for r, _ in REGIONS]
     for n in range(7, 43):
@@ -78,11 +86,30 @@ def make_mediators(rng: random.Random) -> list[Mediator]:
             last += "a"
         if not first.endswith("a") and last.endswith("a"):
             last = last[:-1]
+        picked = rng.sample(types, k=rng.choice([2, 3]))  # same rng calls as before: keeps the seeded distributions
+        region = rng.choice(regions)
+        reg_day = date(2019 + n % 6, n % 12 + 1, n % 27 + 1)
         out.append(Mediator(id=f"m-{n:02d}", name=f"{first} {last}", photo="", registry_no=f"MR-{1040 + n * 7}",
-                            specialties=rng.sample(types, k=rng.choice([2, 3])), languages=["uz", "ru"] if n % 4 else ["uz"],
-                            region=rng.choice(regions), price_uzs=rng.choice([250_000, 300_000, 350_000, 400_000, 450_000]),
+                            registry_date=reg_day, areas=sorted({t if t in ("mehnat", "oilaviy") else "fuqarolik" for t in picked}),
+                            languages=["uz", "ru"] if n % 4 else (["uz", "tr"] if n % 8 else ["uz"]),
+                            address=f"{Region(region).label}, demo manzil", phone=f"+99890{1000000 + n * 1111:07d}",
+                            email=f"m-{n:02d}@mediatsiya.demo", certificate_no=f"M {n * 37:06d}",
+                            certificate_date=reg_day - timedelta(days=30),
+                            region=region, price_uzs=rng.choice([250_000, 300_000, 350_000, 400_000, 450_000]),
                             rating=round(rng.uniform(4.2, 4.8), 1), sessions=rng.randint(12, 140), years=rng.randint(2, 8),
                             bio="Professional mediator. Demo profil.", is_demo=True))
+    for m in out:
+        if not m.resolved:
+            m.resolved = round(m.sessions * 0.62)
+            m.reviews = round(m.resolved * 0.7)
+    # Demo logins for every other mediator: m02 … m42 / mediator123 (public on purpose, like the other demo accounts).
+    # One hash for all: 41 separate PBKDF2 hashes would make a demo reset take ~10 s.
+    demo_hash = make_password("mediator123")
+    for m in out:
+        if m.user is None:
+            u, _ = User.objects.update_or_create(username=m.id.replace("-", ""), defaults={"password": demo_hash})
+            Profile.objects.update_or_create(user=u, defaults={"role": "mediator", "full_name": m.name, "phone": m.phone})
+            m.user = u
     Mediator.objects.bulk_create(out)
     return out
 
@@ -98,7 +125,7 @@ def seed(wipe: bool = False) -> int:
     if wipe:
         CaseEvent.objects.all().delete()
         Case.objects.all().delete()
-        Mediator.objects.all().delete()
+        Mediator.objects.filter(is_demo=True).delete()  # keep self-registered mediators
     if Case.objects.exists():
         return Case.objects.count()
     User = get_user_model()
@@ -139,6 +166,8 @@ def seed(wipe: bool = False) -> int:
             days = rng.choice([3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18])
             c.status, c.mediator, c.agreed_at = "agreed", mediator, created + timedelta(days=days, hours=rng.randint(1, 6))
             c.session_at = c.agreed_at - timedelta(hours=2)
+            c.fee_uzs = mediator.price_uzs  # finished cases: both halves paid, escrow released
+            c.claimant_paid_at = c.respondent_paid_at = c.session_at - timedelta(days=1)
             c.agreement = {"title": f"Mediativ kelishuv № {c.code}", "clauses": [
                 {"title": "1. Tomonlar", "body": "Tomonlar mediator ishtirokida kelishuvga erishdilar."},
                 {"title": "2. Shartlar", "body": "Majburiyatlar kelishilgan jadval asosida bajariladi."}],
@@ -157,6 +186,7 @@ def seed(wipe: bool = False) -> int:
             else:
                 c.status, c.mediator = "scheduled", mediator
                 c.session_at = created + timedelta(days=rng.randint(2, 6))
+                c.fee_uzs = mediator.price_uzs
                 steps += ["accepted", "scheduled"]
         c.classification = {"dispute_type": dtype, "mediable": True, "reason": "", "summary": SAMPLES[dtype], "amount_uzs": amount,
                             "confidence": 0.9, "source": "ai"}
@@ -176,18 +206,22 @@ def seed(wipe: bool = False) -> int:
                  description=base["description"], claimant=ariza, respondent_name=base["respondent"]["name"],
                  respondent_phone=base["respondent"]["phone"], classification=base["classification"], comparison=comparison_for(base["amount_uzs"]),
                  invite_text=base["invite_text"], claimant_position=base["claimant_position"], respondent_position=base["respondent_position"],
-                 mediator=m01, created_at=created)
+                 mediator=m01, fee_uzs=m01.price_uzs, created_at=created)
         if status == "agreed":
             c.brief = base["brief"]
             c.agreement = fx("agreement.json")
             c.agreement["title"] = f"Mediativ kelishuv № {code}"
             c.session_at = created + timedelta(days=6)
             c.agreed_at = created + timedelta(days=7)
+            c.claimant_paid_at = c.respondent_paid_at = created + timedelta(days=5)
             steps = ["created", "invited", "accepted", "scheduled", "agreed"]
         else:
             c.invite_token = "demo-invite-0042"
             c.session_at = (now + timedelta(days=1)).replace(hour=10, minute=0, second=0, microsecond=0)
             steps = ["created", "invited", "accepted", "scheduled"]
+        # Art. 19, 20: the procedure agreement both parties consented to when the mediator was confirmed
+        c.procedure = terms(c, m01, "uz", created + timedelta(hours=9 if status == "scheduled" else 60))
+        c.procedure_deadline = datetime.fromisoformat(c.procedure["deadline"])
         cases.append(c)
         t = created
         for s in steps:
@@ -196,4 +230,12 @@ def seed(wipe: bool = False) -> int:
 
     Case.objects.bulk_create(cases)
     CaseEvent.objects.bulk_create(events)
+    # Art. 29: the sealed showcase agreement names both parties in full, with addresses
+    sealed = next(c for c in cases if c.code == "MD-2026-0041")
+    for party, full_name, address in (
+        ("claimant", "Karimov Aziz Bahodirovich", "Toshkent sh., Yunusobod tumani, Amir Temur koʻchasi, 12-uy (demo)"),
+        ("respondent", "Umarov Bekzod Rustamovich", "Toshkent sh., Chilonzor tumani, 9-mavze, 14-uy, 23-xonadon (demo)"),
+    ):
+        Approval.objects.create(case=sealed, party=party, decision="approved", agreement_hash=agreement_hash(sealed.agreement),
+                                full_name=full_name, address=address, at=sealed.agreed_at - timedelta(hours=2))
     return len(cases)

@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowRight, Building2, Scale, UserRound } from "lucide-react";
+import { ArrowRight, Scale, UserRound } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { cn } from "cn";
 import { Logo } from "@/components/brand/logo";
+import { HomeButton } from "@/components/shell/home-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +19,6 @@ import type { LoginResponse } from "@/lib/types";
 const DEMO = [
   { u: "ariza", p: "ariza123", label: "Murojaatchi", hint: "Aziz Karimov", icon: UserRound },
   { u: "mediator", p: "mediator123", label: "Mediator", hint: "Dilnoza Rahimova", icon: Scale },
-  { u: "vazirlik", p: "vazirlik123", label: "Vazirlik", hint: "Statistika paneli", icon: Building2 },
 ];
 
 function LoginForm() {
@@ -117,13 +117,20 @@ function LoginForm() {
           ))}
         </div>
       </div>
+      <p className="mt-6 text-center text-sm text-ink-soft">
+        Hisobingiz yoʻqmi?{" "}
+        <Link href={`/royxat${params.get("next") ? `?next=${encodeURIComponent(params.get("next")!)}` : ""}`} className="font-semibold text-accord hover:underline">
+          Roʻyxatdan oʻting
+        </Link>
+      </p>
     </motion.div>
   );
 }
 
 export default function KirishPage() {
   return (
-    <main className="relative isolate flex flex-1 flex-col items-center overflow-x-clip px-4 py-8 sm:py-14">
+    <main className="relative isolate flex flex-1 flex-col items-center overflow-x-clip px-4 py-6 sm:py-10">
+      <HomeButton />
       <Link href="/" className="mb-8">
         <Logo />
       </Link>

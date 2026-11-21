@@ -19,7 +19,8 @@ export const roomApi = {
     api<Meeting>(`${base(t)}meetings/`, { body: m }),
   answer: (t: RoomTarget, id: string, status: "accepted" | "declined" | "cancelled") =>
     api<Meeting>(t.kind === "case" ? `/rooms/meetings/${id}/` : `/rooms/t/${t.token}/meetings/${id}/`, { body: { status } }),
-  approve: (t: RoomTarget, decision: "approved" | "changes", comment = "") => api<{ approvals: Room["approvals"] }>(`${base(t)}approve/`, { body: { decision, comment } }),
+  approve: (t: RoomTarget, decision: "approved" | "changes", comment = "", signer: { full_name?: string; address?: string } = {}) =>
+    api<{ approvals: Room["approvals"] }>(`${base(t)}approve/`, { body: { decision, comment, ...signer } }),
 };
 
 export function useRoom(t: RoomTarget | null, refreshMs = 4000) {

@@ -15,6 +15,9 @@ from rest_framework.response import Response
 
 from accounts.views import role_of
 from cases.models import Case
+from cases.procedure import can_terminate, expire_if_due, extend, preview, terminate
+from cases.serializers import signatories
+from mediators.serializers import MediatorSerializer
 
 from .logic import agreement_hash, approvals_state, clash
 from .models import Approval, Meeting, Message, Party
@@ -28,7 +31,7 @@ PARTY_LABEL = {"claimant": "murojaatchi", "respondent": "ikkinchi tomon"}
 
 def case_for_user(request, case_id) -> tuple[Case, str]:
     """Returns (case, actor) where actor is "mediator" or "claimant"."""
-    case = get_object_or_404(Case.objects.select_related("claimant__profile", "mediator"), pk=case_id)
+    case = expire_if_due(get_object_or_404(Case.objects.select_related("claimant__profile", "mediator"), pk=case_id))
     user = request.user
     if case.mediator and case.mediator.user_id == user.id:
         return case, "mediator"
@@ -43,7 +46,13 @@ def case_for_token(token) -> Case:
     case = Case.objects.select_related("claimant__profile", "mediator").filter(invite_token=token).first()
     if case is None:
         raise NotFound("Taklif topilmadi yoki muddati oʻtgan")
-    return case
+    return expire_if_due(case)
+
+
+def require_active(case):
+    """Writes are allowed only while the mediation runs; a terminated case is read-only (Art. 24)."""
+    if case.status == "terminated":
+        raise PermissionDenied("Mediatsiya tugatilgan")
 
 
 def require_mediator(case):
@@ -94,6 +103,15 @@ def room_json(case, actor):
         "agreement": case.agreement,
         "agreement_hash": agreement_hash(case.agreement),
         "approvals": approvals_state(case),
+        "payment": case.payment(),
+        "proposed_mediator": MediatorSerializer(case.proposed_mediator).data if case.proposed_mediator else None,
+        "proposed_session_at": case.proposed_session_at,
+        "procedure": case.procedure or preview(case),
+        "procedure_deadline": case.procedure_deadline,
+        "extended": case.extended,
+        "extension_requested_by": case.extension_requested_by,
+        "termination_reason": case.termination_reason,
+        "signatories": signatories(case),
     }
 
 
@@ -105,6 +123,7 @@ def handle_messages(request, case, actor, party):
     if party not in ("claimant", "respondent"):
         return Response({"detail": "Suhbat tanlanmagan"}, status=400)
     if request.method == "POST":
+        require_active(case)
         text = str(request.data.get("text", "")).strip()
         if not text:
             return Response({"detail": "Xabar boʻsh"}, status=400)
@@ -123,6 +142,7 @@ def handle_messages(request, case, actor, party):
 
 
 def handle_answer(request, case, party, meeting_id):
+    require_active(case)
     m = get_object_or_404(Meeting, pk=meeting_id, case=case, party=party)
     status = request.data.get("status")
     if status not in (Meeting.Status.ACCEPTED, Meeting.Status.DECLINED):
@@ -137,14 +157,22 @@ def handle_answer(request, case, party, meeting_id):
 
 
 def handle_approve(request, case, party):
+    require_active(case)
     if not case.agreement:
         return Response({"detail": "Kelishuv loyihasi hali yoʻq"}, status=400)
     decision = request.data.get("decision")
     if decision not in ("approved", "changes"):
         return Response({"detail": "Notoʻgʻri qaror"}, status=400)
     comment = str(request.data.get("comment", ""))[:500]
+    full_name = " ".join(str(request.data.get("full_name", "")).split())[:160]
+    address = str(request.data.get("address", "")).strip()[:250]
+    # Art. 29: surname, first name, patronymic and a residence or postal address of each party
+    if decision == "approved" and (len(full_name.split()) < 3 or len(address) < 10):
+        return Response({"detail": "Familiya, ism, otasining ismi va yashash joyi (pochta manzili) kerak (29-modda)"}, status=400)
     Approval.objects.update_or_create(
-        case=case, party=party, defaults={"decision": decision, "comment": comment, "agreement_hash": agreement_hash(case.agreement), "at": timezone.now()}
+        case=case, party=party,
+        defaults={"decision": decision, "comment": comment, "agreement_hash": agreement_hash(case.agreement), "at": timezone.now(),
+                  "full_name": full_name, "address": address},
     )
     text = "Kelishuv loyihasini tasdiqladi." if decision == "approved" else f"Kelishuvga oʻzgartirish soʻradi: {comment or '—'}"
     Message.objects.create(case=case, party=party, sender=party, text=text, read_by_party=True)
@@ -176,6 +204,7 @@ def meetings(request, case_id):
     if actor != "mediator":
         raise PermissionDenied("Uchrashuvni faqat mediator belgilaydi")
     require_mediator(case)
+    require_active(case)
     d = request.data
     party = d.get("party")
     start = parse_datetime(str(d.get("start", "")))
@@ -252,3 +281,107 @@ def t_meeting_answer(request, token, meeting_id):
 @permission_classes([AllowAny])
 def t_approve(request, token):
     return handle_approve(request, case_for_token(token), "respondent")
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def t_pay(request, token):
+    from cases.views import pay_share
+
+    case = case_for_token(token)
+    if error := pay_share(case, "respondent"):
+        return error
+    return Response(room_json(case, "respondent"))
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def t_mediator(request, token):
+    """Respondent: {mediator_id, accept} confirms or rejects the claimant's proposed mediator."""
+    from cases.views import answer_proposal
+
+    case = case_for_token(token)
+    if error := answer_proposal(case, str(request.data.get("mediator_id", "")), bool(request.data.get("accept"))):
+        return error
+    return Response(room_json(case_for_token(token), "respondent"))
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def t_drop_mediator(request, token):
+    from cases.views import drop_mediator
+
+    case = case_for_token(token)
+    if error := drop_mediator(case, "respondent"):
+        return error
+    return Response(room_json(case_for_token(token), "respondent"))
+
+
+# ---------------- Art. 7, 9, 11, 23, 24, 28: ending, refusing, extending ----------------
+
+
+def handle_terminate(request, case, by):
+    if not can_terminate(case, by):
+        return Response({"detail": "Bu bosqichda mediatsiyani tugatib boʻlmaydi"}, status=400)
+    terminate(case, by, str(request.data.get("reason", "")))
+    return None
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def terminate_view(request, case_id):
+    """Claimant: withdraws at any stage (Art. 7, 11). Mediator: no agreement is possible (Art. 24)."""
+    case, actor = case_for_user(request, case_id)
+    if actor == "mediator" and not (case.mediator and case.mediator.user_id == request.user.id):
+        raise PermissionDenied("Faqat ishning mediatori")
+    if error := handle_terminate(request, case, actor):
+        return error
+    return Response(room_json(case, actor))
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def refuse_view(request, case_id):
+    """Art. 9, 13, 28: the mediator refuses the case; the parties get their money back and choose another mediator."""
+    from cases.views import drop_mediator
+
+    case, actor = case_for_user(request, case_id)
+    if not (case.mediator and case.mediator.user_id == request.user.id):
+        raise PermissionDenied("Faqat ishning mediatori")
+    if error := drop_mediator(case, "mediator"):
+        return error
+    return Response({"ok": True})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def extend_view(request, case_id):
+    case, actor = case_for_user(request, case_id)
+    if actor != "claimant":
+        raise PermissionDenied("Muddatni taraflar uzaytiradi")
+    if error := extend(case, "claimant"):
+        return Response({"detail": error}, status=400)
+    return Response(room_json(case, actor))
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def t_terminate(request, token):
+    case = case_for_token(token)
+    if error := handle_terminate(request, case, "respondent"):
+        return error
+    return Response(room_json(case, "respondent"))
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def t_extend(request, token):
+    case = case_for_token(token)
+    if error := extend(case, "respondent"):
+        return Response({"detail": error}, status=400)
+    return Response(room_json(case, "respondent"))

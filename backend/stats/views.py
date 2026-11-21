@@ -1,9 +1,7 @@
 from django.utils import timezone
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 
-from accounts.views import role_of
 from cases.models import Case, DisputeType, Region
 
 
@@ -23,11 +21,8 @@ def last_months(n):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@authentication_classes([])  # public: aggregated, no personal data; shown on the landing page
 def stats(request):
-    if role_of(request.user) not in ("ministry", "admin"):
-        return Response({"detail": "Bu sahifa faqat vazirlik uchun"}, status=403)
-
     # shortcut: aggregates in Python over all rows; fine for hundreds of cases, move to SQL at ~10k
     rows = list(Case.objects.values("dispute_type", "region", "created_at", "agreed_at", "comparison", "mediator_id"))
     agreed = [r for r in rows if r["agreed_at"]]

@@ -54,6 +54,10 @@ export function PartyApproval({ room, target, party, onChange }: { room: Room; t
   const [busy, setBusy] = useState(false);
   const mine = room.approvals[party];
   const agreed = room.status === "agreed" || room.status === "closed";
+  // Art. 29: the agreement names each party in full (with patronymic) and gives a residence or postal address
+  const [fullName, setFullName] = useState(mine?.full_name || room.names[party]);
+  const [address, setAddress] = useState(mine?.address ?? "");
+  const signerOk = fullName.trim().split(/\s+/).length >= 3 && address.trim().length >= 10;
 
   if (!room.agreement) {
     return (
@@ -66,7 +70,7 @@ export function PartyApproval({ room, target, party, onChange }: { room: Room; t
   async function send(decision: "approved" | "changes") {
     setBusy(true);
     try {
-      await roomApi.approve(target, decision, decision === "changes" ? comment : "");
+      await roomApi.approve(target, decision, decision === "changes" ? comment : "", decision === "approved" ? { full_name: fullName, address } : {});
       toast.success(decision === "approved" ? "Kelishuv tasdiqlandi" : "Izohingiz mediatorga yuborildi");
       setAsking(false);
       onChange();
@@ -123,13 +127,38 @@ export function PartyApproval({ room, target, party, onChange }: { room: Room; t
               </div>
             </div>
           ) : (
+            <div className="space-y-3">
+              <div className="grid gap-3 rounded-xl border border-rule bg-white p-4 sm:grid-cols-2">
+                <p className="text-sm text-ink-soft sm:col-span-2">Kelishuvda koʻrsatiladi (29-modda):</p>
+                <label className="space-y-1 text-sm font-medium text-ink">
+                  Familiya, ism, otasining ismi
+                  <input
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    autoComplete="name"
+                    placeholder="Karimov Aziz Bahodirovich"
+                    className="h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-base font-normal outline-none focus:border-accord"
+                  />
+                </label>
+                <label className="space-y-1 text-sm font-medium text-ink">
+                  Yashash joyi yoki pochta manzili
+                  <input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    autoComplete="street-address"
+                    placeholder="Toshkent sh., Chilonzor t., 9-mavze, 14-uy"
+                    className="h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-base font-normal outline-none focus:border-accord"
+                  />
+                </label>
+              </div>
             <div className="flex flex-wrap gap-2">
-              <Button size="lg" variant="accord" disabled={busy} onClick={() => send("approved")}>
+              <Button size="lg" variant="accord" disabled={busy || !signerOk} onClick={() => send("approved")}>
                 <CheckCircle2 className="size-5" /> Tasdiqlayman
               </Button>
               <Button size="lg" variant="outline" disabled={busy} onClick={() => setAsking(true)}>
                 Oʻzgartirish soʻrash
               </Button>
+            </div>
             </div>
           )}
           <p className="text-xs text-ink-soft">{PARTY_TITLE[party]} sifatida tasdiqlaysiz. Matn oʻzgarsa, tasdiq qayta soʻraladi.</p>

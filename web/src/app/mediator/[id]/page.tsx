@@ -3,6 +3,7 @@
 import { ArrowLeft, Check, FileDown, FileSignature, PenLine, Plus, Send, Sparkles, Stamp, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { use, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -16,6 +17,8 @@ import { MediatorInbox } from "@/components/room/inbox";
 import { MeetingsPanel } from "@/components/room/meetings";
 import { RoomTabs } from "@/components/room/tabs";
 import { CaseHeader, PositionCard, Timeline } from "@/components/case/parts";
+import { MediatorPaymentCard } from "@/components/case/payment";
+import { ProcedureDoc, TermCard, TerminateButton } from "@/components/case/procedure";
 import { AppShell } from "@/components/shell/app-header";
 import { Button } from "@/components/ui/button";
 import { api, errorText } from "@/lib/api";
@@ -35,7 +38,8 @@ type Stage = "idle" | "briefing" | "drafting" | "editing" | "sealing";
 type Tab = "ish" | "chat" | "uchrashuv";
 
 function Workspace({ id }: { id: string }) {
-  const { data: c, mutate } = useSWR<Case>(`/cases/${id}/`, (p: string) => api<Case>(p));
+  const router = useRouter();
+  const { data: c, mutate } = useSWR<Case>(`/cases/${id}/`, (p: string) => api<Case>(p), { refreshInterval: 5000 });
   const [stage, setStage] = useState<Stage>("idle");
   const [ready, setReady] = useState(false);
   const [pendingBrief, setPendingBrief] = useState<Brief | null>(null);
@@ -125,6 +129,17 @@ function Workspace({ id }: { id: string }) {
       toast.error(errorText(e));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function refuse() {
+    if (!window.confirm("Ishni rad etasizmi? Taraflar toʻlagan pul toʻliq qaytariladi, ish sizning roʻyxatingizdan chiqadi.")) return;
+    try {
+      await api(`/rooms/${id}/refuse/`, { body: {} });
+      toast.success("Ish rad etildi, taraflar boshqa mediator tanlaydi");
+      router.push("/mediator");
+    } catch (e) {
+      toast.error(errorText(e));
     }
   }
 
@@ -350,11 +365,38 @@ function Workspace({ id }: { id: string }) {
               </motion.section>
             )}
           </AnimatePresence>
+          {(c.claimant_position || c.respondent_position) && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {c.claimant_position && <PositionCard title="Murojaatchi" name={c.claimant.name} data={c.claimant_position} tone="ink" />}
+              {c.respondent_position && <PositionCard title="Ikkinchi tomon" name={c.respondent.name} data={c.respondent_position} tone="accord" />}
+            </div>
+          )}
+          {c.procedure && <ProcedureDoc p={c.procedure} />}
         </div>
 
         <aside className="space-y-6">
-          {c.claimant_position && <PositionCard title="Murojaatchi" name={c.claimant.name} data={c.claimant_position} tone="ink" />}
-          {c.respondent_position && <PositionCard title="Ikkinchi tomon" name={c.respondent.name} data={c.respondent_position} tone="accord" />}
+          {c.status === "terminated" && (
+            <p className="rounded-2xl border border-rule bg-muted p-4 text-ink">
+              <b>Mediatsiya tugatildi.</b> {[...c.events].reverse().find((e) => e.kind.startsWith("terminated_"))?.label}
+              {c.termination_reason ? `: «${c.termination_reason}»` : ""}
+            </p>
+          )}
+          {c.status === "scheduled" && <TermCard room={c} />}
+          {c.status === "scheduled" && (
+            <div className="sheet space-y-2 p-5">
+              <p className="text-sm text-ink-soft">
+                Mustaqilligingiz yoki xolisligingizga taʼsir qiluvchi holat boʻlsa (masalan, taraflardan biri bilan qarindoshlik), ishni rad etishingiz shart (9, 25-moddalar).
+                Taraflarga toʻlangan pul toʻliq qaytariladi (28-modda).
+              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <Button size="sm" variant="outline" onClick={refuse}>
+                  Ishni rad etish
+                </Button>
+                <TerminateButton target={{ kind: "case", id }} who="mediator" onDone={() => void mutate()} />
+              </div>
+            </div>
+          )}
+          {c.payment && <MediatorPaymentCard payment={c.payment} />}
           <section className={cn("sheet p-5")}>
             <h2 className="mb-4 text-lg font-semibold text-ink">Jarayon</h2>
             <Timeline events={c.events} />

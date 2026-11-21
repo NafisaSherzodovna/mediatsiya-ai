@@ -38,6 +38,6 @@ class RoomRulesTest(TestCase):
         agreement = {"title": "K", "clauses": [{"title": "1", "body": "a"}], "citations": [], "source": "ai"}
         self.assertEqual(mediator.patch(f"/api/cases/{case.id}/", {"agreement": agreement}, format="json").status_code, 200)
         self.assertEqual(mediator.patch(f"/api/cases/{case.id}/", {"status": "agreed"}, format="json").status_code, 400)
-        self.assertEqual(client.post(f"/api/rooms/{case.id}/approve/", {"decision": "approved"}, format="json").status_code, 200)
-        self.assertEqual(APIClient().post(f"/api/rooms/t/{case.invite_token}/approve/", {"decision": "approved"}, format="json").status_code, 200)
+        self.assertEqual(client.post(f"/api/rooms/{case.id}/approve/", {"decision": "approved", "full_name": "Karimov Aziz Bahodirovich", "address": "Toshkent sh., Chilonzor 5-uy"}, format="json").status_code, 200)
+        self.assertEqual(APIClient().post(f"/api/rooms/t/{case.invite_token}/approve/", {"decision": "approved", "full_name": "Karimov Aziz Bahodirovich", "address": "Toshkent sh., Chilonzor 5-uy"}, format="json").status_code, 200)
         self.assertEqual(mediator.patch(f"/api/cases/{case.id}/", {"status": "agreed"}, format="json").status_code, 200)

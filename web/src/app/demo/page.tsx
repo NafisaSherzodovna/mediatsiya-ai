@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, KeyRound, Mic, RotateCcw, Scale, UserRound, Wand2 } from "lucide-react";
+import { KeyRound, Mic, RotateCcw, Scale, UserRound, Wand2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,7 +18,6 @@ const KEY = "ma.demo.key";
 const ACCOUNTS = [
   { u: "ariza", p: "ariza123", label: "Murojaatchi", icon: UserRound },
   { u: "mediator", p: "mediator123", label: "Mediator", icon: Scale },
-  { u: "vazirlik", p: "vazirlik123", label: "Vazirlik", icon: Building2 },
 ];
 
 /** Unlisted stage helper page for the pitch. */

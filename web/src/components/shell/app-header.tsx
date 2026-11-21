@@ -16,21 +16,69 @@ const NAV: Record<Role, { href: string; label: string }[]> = {
   claimant: [
     { href: "/ishlar", label: "Ishlarim" },
     { href: "/murojaat", label: "Yangi murojaat" },
+    { href: "/mediatorlar", label: "Mediatorlar" },
     { href: "/huquq", label: "Huquqiy yordamchi" },
   ],
   mediator: [{ href: "/mediator", label: "Ishlar" }],
-  ministry: [{ href: "/vazirlik", label: "Statistika" }],
   admin: [
-    { href: "/vazirlik", label: "Statistika" },
+    { href: "/#statistika", label: "Statistika" },
     { href: "/admin/", label: "Operator paneli" },
   ],
 };
 
+// Visitors without an account still get a way around (and back to the home page).
+const GUEST_NAV = [
+  { href: "/", label: "Bosh sahifa" },
+  { href: "/#statistika", label: "Statistika" },
+  { href: "/huquq", label: "Huquqiy yordamchi" },
+];
+
+const active = (path: string, href: string) => (href === "/" ? path === "/" : !href.includes("#") && path.startsWith(href));
+
+/** Signed in: avatar, name and role (a link to the cabinet) plus logout. Signed out: login and register. */
+export function UserMenu() {
+  const { user } = useUser();
+  const router = useRouter();
+  if (!user) {
+    return (
+      <>
+        <Button asChild size="sm" variant="outline">
+          <Link href="/kirish">Kirish</Link>
+        </Button>
+        <Button asChild size="sm" className="hidden sm:inline-flex">
+          <Link href="/royxat">Roʻyxatdan oʻtish</Link>
+        </Button>
+      </>
+    );
+  }
+  return (
+    <>
+      <Link href={ROLE_HOME[user.role]} aria-label="Kabinet" className="flex items-center gap-2.5 rounded-xl px-1.5 py-1 hover:bg-ink-wash">
+        <Avatar name={user.name} className="size-9 text-xs" />
+        <span className="hidden leading-tight sm:block">
+          <span className="block text-sm font-semibold text-ink">{user.name}</span>
+          <span className="block text-xs text-ink-soft">{ROLE_LABEL[user.role]}</span>
+        </span>
+      </Link>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Chiqish"
+        onClick={() => {
+          logout();
+          router.push("/");
+        }}
+      >
+        <LogOut className="size-[18px]" />
+      </Button>
+    </>
+  );
+}
+
 export function AppHeader() {
   const { user } = useUser();
   const path = usePathname();
-  const router = useRouter();
-  const nav = user ? NAV[user.role] : [];
+  const nav = user ? NAV[user.role] : GUEST_NAV;
   return (
     <header className="no-print sticky top-0 z-30 border-b border-rule/70 bg-paper/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4">
@@ -44,7 +92,7 @@ export function AppHeader() {
               href={n.href}
               className={cn(
                 "rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition-colors hover:bg-ink-wash hover:text-ink",
-                path.startsWith(n.href) && "bg-ink-wash text-ink",
+                active(path, n.href) && "bg-ink-wash text-ink",
               )}
             >
               {n.label}
@@ -52,32 +100,7 @@ export function AppHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-3">
-          {user ? (
-            <>
-              <div className="hidden items-center gap-2.5 sm:flex">
-                <Avatar name={user.name} className="size-9 text-xs" />
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold text-ink">{user.name}</p>
-                  <p className="text-xs text-ink-soft">{ROLE_LABEL[user.role]}</p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Chiqish"
-                onClick={() => {
-                  logout();
-                  router.push("/");
-                }}
-              >
-                <LogOut className="size-[18px]" />
-              </Button>
-            </>
-          ) : (
-            <Button asChild size="sm" variant="outline">
-              <Link href="/kirish">Kirish</Link>
-            </Button>
-          )}
+          <UserMenu />
         </div>
       </div>
       {nav.length > 0 && (
@@ -88,7 +111,7 @@ export function AppHeader() {
               href={n.href}
               className={cn(
                 "shrink-0 rounded-full border border-rule px-3 py-1.5 text-sm font-medium text-ink-soft",
-                path.startsWith(n.href) && "border-ink bg-ink text-white",
+                active(path, n.href) && "border-ink bg-ink text-white",
               )}
             >
               {n.label}

@@ -6,4 +6,4 @@ from .models import Mediator
 class MediatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mediator
-        exclude = ["user"]
+        exclude = ["user", "approved", "removed_at"]

@@ -19,7 +19,8 @@ The demo UI must be excellent. Speed beats polished internals.
 ## Working rules
 
 - **Language:** talk to the user in Uzbek. Code, identifiers, comments and commit messages are in English.
-  UI text is Uzbek in classic Latin with `ʻ` (U+02BB), e.g. `oʻ gʻ`.
+  UI text is written in classic Latin with `ʻ` (U+02BB) in the source, e.g. `oʻ gʻ`; the site *displays* it in the new
+  alphabet (ş ç ğ ö) through `web/src/lib/yangi.ts` + `YangiBridge` (user decision, 2026-11-21). Don't convert source strings.
 - **Ownership:** edit only your paths (overview, "Ownership"). Need something from the other role? Mock it,
   keep going, and open a `[for-A]` or `[for-B]` issue.
 - **Contract:** `contract/api.md` + `contract/fixtures/` are shared. Additive changes only, in a separate

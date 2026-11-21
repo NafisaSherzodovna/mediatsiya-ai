@@ -55,8 +55,10 @@ function Wizard() {
   const { user } = useUser();
   const [phase, setPhase] = useState<Phase>("describe");
   // Wizard renders only after the client-side role check, so reading localStorage here is safe.
-  const [text, setText] = useState(() => (typeof window !== "undefined" && takeDemoPrefill("voice") ? SAMPLE_VOICE : ""));
-  const [region, setRegion] = useState<Region>("toshkent-sh");
+  const [prefilled] = useState(() => typeof window !== "undefined" && takeDemoPrefill("voice"));
+  const [text, setText] = useState(prefilled ? SAMPLE_VOICE : "");
+  // No default region: the claimant picks one (the stage demo prefills Toshkent so it never stalls)
+  const [region, setRegion] = useState<Region | "">(prefilled ? "toshkent-sh" : "");
   const [classification, setClassification] = useState<Classification | null>(null);
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [rName, setRName] = useState("");

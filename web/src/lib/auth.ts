@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ROLE_LABEL } from "./labels";
 import type { LoginResponse, User } from "./types";
 
 const TOKEN_KEY = "ma.token";
@@ -34,7 +35,9 @@ export function getUser(): User | null {
   const raw = read(USER_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as User;
+    const u = JSON.parse(raw) as User;
+    // a session saved under a removed role (e.g. "ministry") would crash role lookups
+    return u.role in ROLE_LABEL ? u : null;
   } catch {
     return null;
   }

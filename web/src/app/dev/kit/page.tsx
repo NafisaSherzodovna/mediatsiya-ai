@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { som } from "@/lib/format";
 import type { CaseStatus } from "@/lib/types";
 
-const STATUSES: CaseStatus[] = ["new", "invited", "accepted", "declined", "scheduled", "agreed", "closed"];
+const STATUSES: CaseStatus[] = ["new", "invited", "accepted", "declined", "scheduled", "agreed", "closed", "terminated"];
 
 export default function Kit() {
   const [run, setRun] = useState(0);

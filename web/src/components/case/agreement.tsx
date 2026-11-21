@@ -85,13 +85,14 @@ export function AgreementDoc({ c, agreement, qr, stamped = true, className }: { 
       </ol>
       <div className="mt-10 grid gap-8 font-sans text-sm sm:grid-cols-3">
         {[
-          { r: "Murojaatchi", n: c.claimant.name },
-          { r: "Ikkinchi tomon", n: c.respondent.name },
-          { r: "Mediator", n: c.mediator?.name ?? "—" },
+          { r: "Murojaatchi", n: c.signatories?.claimant?.full_name || c.claimant.name, a: c.signatories?.claimant?.address },
+          { r: "Ikkinchi tomon", n: c.signatories?.respondent?.full_name || c.respondent.name, a: c.signatories?.respondent?.address },
+          { r: "Mediator · tasdiqladi", n: c.mediator?.name ?? "—", a: c.mediator ? `Reyestr № ${c.mediator.registry_no}` : undefined },
         ].map((s) => (
           <div key={s.r}>
             <div className="h-10 border-b border-ink/40" />
             <p className="mt-1.5 font-semibold text-ink">{s.n}</p>
+            {s.a && <p className="text-xs text-ink">{s.a}</p>}
             <p className="text-ink-soft">{s.r}</p>
           </div>
         ))}

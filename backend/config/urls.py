@@ -8,6 +8,10 @@ def health(request):
     return JsonResponse({"ok": True, "ai": bool(settings.GEMINI_API_KEYS)})
 
 
+admin.site.site_header = "Murosa boshqaruvi"
+admin.site.site_title = "Murosa"
+admin.site.index_title = "Platformani boshqarish"
+
 urlpatterns = [
     re_path(r"^api/health/?$", health),
     path("api/auth/", include("accounts.urls")),
