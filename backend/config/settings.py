@@ -22,7 +22,7 @@ GEMINI_MODELS = env_list("GEMINI_MODELS", "gemini-3.5-flash-lite,gemini-flash-la
 DEMO_RESET_KEY = os.environ.get("DEMO_RESET_KEY", "")
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["https://*.netlify.app", "http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = ["https://*.netlify.app", "https://*.sslip.io", "http://localhost:3000"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
