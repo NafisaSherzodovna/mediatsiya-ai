@@ -1,30 +1,40 @@
 import { cn } from "cn";
 import { BRAND } from "@/lib/brand";
 
-/** The mark: two circles are the two sides; where they overlap (teal) is the common ground, the "murosa". */
-export function LogoMark({ className }: { className?: string }) {
+// Brand assets from docs/brand/ (murosa-mark.svg, murosa-logo.svg, murosa-logo-dark.svg), inlined so they need no request.
+const MARK = {
+  ink: { bg: "#1B2A4A", line: "#FAF8F3", bridge: "#3DDC97", dot: "#FFE58A", word: "#1B2A4A" },
+  light: { bg: "#FAF8F3", line: "#1B2A4A", bridge: "#0F8F5F", dot: "#E0A526", word: "#FAF8F3" },
+} as const;
+const WORDMARK = "M74.62 -48V0H62.02V-36.42L46.27 0H32.83L17.09 -36.22V0H4.48V-48H24.96L39.62 -12.93L54.14 -48Z M98.43 1.02Q93.31 1.02 89.7 -1.09Q86.08 -3.2 84.16 -7.07Q82.24 -10.94 82.24 -16.13V-36.54H95.3V-17.98Q95.3 -13.95 97.28 -11.78Q99.26 -9.6 102.98 -9.6Q105.73 -9.6 107.58 -10.72Q109.44 -11.84 110.46 -13.95Q111.49 -16.06 111.49 -19.01V-36.54H124.54V-12.61L126.91 0H113.86L112.64 -7.55Q112.51 -7.3 112.38 -7.1Q109.89 -3.07 106.3 -1.02Q102.72 1.02 98.43 1.02Z M130.69 -36.54H144L145.6 -26.82Q146.56 -29.57 148.03 -31.81Q149.76 -34.5 152.38 -36.06Q155.01 -37.63 158.78 -37.63Q159.87 -37.63 161.02 -37.5Q162.18 -37.38 163.33 -37.12V-25.98Q161.41 -26.37 159.71 -26.53Q158.02 -26.69 156.61 -26.69Q153.79 -26.69 151.42 -25.57Q149.06 -24.45 147.62 -21.89Q146.18 -19.33 146.18 -15.04V0H133.12V-24.26Z M189.57 1.02Q182.53 1.02 177.28 -1.38Q172.03 -3.78 169.09 -8.16Q166.14 -12.54 166.14 -18.24Q166.14 -24.06 169.09 -28.42Q172.03 -32.77 177.28 -35.2Q182.53 -37.63 189.57 -37.63Q196.54 -37.63 201.82 -35.2Q207.1 -32.77 210.05 -28.42Q212.99 -24.06 212.99 -18.24Q212.99 -12.54 210.05 -8.16Q207.1 -3.78 201.82 -1.38Q196.54 1.02 189.57 1.02ZM189.57 -8.64Q192.77 -8.64 195.04 -9.79Q197.31 -10.94 198.53 -13.12Q199.74 -15.3 199.74 -18.24Q199.74 -21.31 198.53 -23.46Q197.31 -25.6 195.04 -26.75Q192.77 -27.9 189.57 -27.9Q186.37 -27.9 184.06 -26.75Q181.76 -25.6 180.54 -23.46Q179.33 -21.31 179.33 -18.3Q179.33 -15.3 180.54 -13.12Q181.76 -10.94 184.06 -9.79Q186.37 -8.64 189.57 -8.64Z M260.86 -11.9Q260.86 -7.68 258.3 -4.8Q255.74 -1.92 251.01 -0.45Q246.27 1.02 239.62 1.02Q232.77 1.02 227.62 -0.64Q222.46 -2.3 219.58 -5.31Q216.7 -8.32 216.51 -12.29H229.76Q230.21 -10.82 231.52 -9.76Q232.83 -8.7 235.01 -8.16Q237.18 -7.62 240.19 -7.62Q244.1 -7.62 246.11 -8.38Q248.13 -9.15 248.13 -10.69Q248.13 -11.9 246.59 -12.51Q245.06 -13.12 241.34 -13.44L234.88 -13.95Q228.42 -14.4 224.61 -15.9Q220.8 -17.41 219.14 -19.81Q217.47 -22.21 217.47 -25.28Q217.47 -29.44 220.06 -32.16Q222.66 -34.88 227.3 -36.26Q231.94 -37.63 238.14 -37.63Q244.29 -37.63 249.09 -36.03Q253.89 -34.43 256.77 -31.58Q259.65 -28.74 260.1 -24.9H246.85Q246.53 -26.11 245.44 -27.1Q244.35 -28.1 242.43 -28.74Q240.51 -29.38 237.5 -29.38Q233.98 -29.38 232.16 -28.61Q230.34 -27.84 230.34 -26.43Q230.34 -25.34 231.46 -24.7Q232.58 -24.06 235.65 -23.81L244.16 -23.17Q250.5 -22.78 254.14 -21.34Q257.79 -19.9 259.33 -17.54Q260.86 -15.17 260.86 -11.9Z M299.39 0 298.43 -7.42Q295.94 -3.58 292.22 -1.41Q288.13 1.02 282.94 1.02Q277.57 1.02 273.5 -1.38Q269.44 -3.78 267.14 -8.16Q264.83 -12.54 264.83 -18.24Q264.83 -24.06 267.14 -28.42Q269.44 -32.77 273.5 -35.2Q277.57 -37.63 282.94 -37.63Q288.13 -37.63 292.22 -35.26Q295.94 -33.02 298.5 -29.25L299.39 -36.54H312.96L310.66 -18.3L312.96 0ZM278.08 -18.24Q278.08 -15.55 279.2 -13.44Q280.32 -11.33 282.3 -10.14Q284.29 -8.96 286.85 -8.96Q289.54 -8.96 291.9 -10.14Q294.27 -11.33 296.06 -13.44Q297.86 -15.55 298.75 -18.24Q297.86 -20.99 296.06 -23.1Q294.27 -25.22 291.9 -26.43Q289.54 -27.65 286.85 -27.65Q284.29 -27.65 282.3 -26.43Q280.32 -25.22 279.2 -23.1Q278.08 -20.99 278.08 -18.24Z";
+
+function MarkShapes({ tone }: { tone: keyof typeof MARK }) {
+  const c = MARK[tone];
   return (
-    <svg viewBox="0 0 40 40" className={cn("size-9", className)} aria-hidden="true">
-      <rect x="1" y="1" width="38" height="38" rx="11" fill="var(--ink)" />
-      <path d="M20 12.8a8.6 8.6 0 0 1 0 14.4a8.6 8.6 0 0 1 0-14.4Z" fill="#5fd3c6" />
-      <circle cx="15.3" cy="20" r="8.6" fill="none" stroke="#fff" strokeWidth="2.2" />
-      <circle cx="24.7" cy="20" r="8.6" fill="none" stroke="#fff" strokeWidth="2.2" />
+    <>
+      <rect width="120" height="120" rx="28" fill={c.bg} />
+      <path d="M26 85V53A17 17 0 0 1 60 53M60 53A17 17 0 0 1 94 53V85" fill="none" stroke={c.line} strokeWidth="10" strokeLinecap="round" />
+      <path d="M60 53V85" fill="none" stroke={c.bridge} strokeWidth="10" strokeLinecap="round" />
+      <circle cx="60" cy="53" r="8.5" fill={c.dot} />
+    </>
+  );
+}
+
+/** The mark: two arches (the two sides) meet in one point; the green bridge under it is the agreement. */
+export function LogoMark({ className, tone = "ink" }: { className?: string; tone?: keyof typeof MARK }) {
+  return (
+    <svg viewBox="0 0 120 120" className={cn("size-9", className)} aria-hidden="true">
+      <MarkShapes tone={tone} />
     </svg>
   );
 }
 
+/** Mark + "Murosa" wordmark. `tone="light"` is the variant for dark backgrounds. */
 export function Logo({ className, tone = "ink" }: { className?: string; tone?: "ink" | "light" }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <LogoMark />
-      <span
-        className={cn(
-          "font-display text-[1.05rem] font-semibold tracking-tight",
-          tone === "light" ? "text-white" : "text-ink",
-        )}
-      >
-        {BRAND.name}
-      </span>
-    </span>
+    <svg viewBox="0 0 472 120" role="img" aria-label={BRAND.name} className={cn("h-9 w-auto", className)}>
+      <MarkShapes tone={tone} />
+      <path transform="translate(156 84)" d={WORDMARK} fill={MARK[tone].word} />
+    </svg>
   );
 }
