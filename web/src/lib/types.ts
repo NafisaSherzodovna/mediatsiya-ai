@@ -56,7 +56,7 @@ export type Agreement = {
   title: string;
   clauses: { title: string; body: string }[];
   citations: Citation[];
-  source: AiSource;
+  source: AiSource | "mediator"; // "mediator": written by the mediator in the workspace form
 };
 export type Mediator = {
   id: string;

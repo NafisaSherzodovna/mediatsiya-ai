@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, FileDown, FileSignature, PenLine, Plus, Send, Sparkles, Stamp, X } from "lucide-react";
+import { ArrowLeft, FileDown, FileSignature, PenLine, Send, Sparkles, Stamp } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { cn } from "cn";
 import { AiThinking } from "@/components/brand/ai-thinking";
-import { AiSourceChip } from "@/components/brand/bits";
 import { Seal } from "@/components/brand/seal";
 import { BriefCard } from "@/components/case/agreement";
 import { ApprovalStatus } from "@/components/room/approval";
@@ -34,7 +33,18 @@ export default function MediatorCasePage({ params }: { params: Promise<{ id: str
   );
 }
 
-type Stage = "idle" | "briefing" | "drafting" | "editing" | "sealing";
+type Stage = "idle" | "briefing" | "editing" | "sealing";
+
+// Art. 29: what a mediative agreement must (and may) say. The parties' full names and addresses are added
+// from their approvals, so the mediator writes only the substance. Fields start empty: the mediator drafts it.
+const FIELDS = [
+  { key: "rights", title: "1. Tomonlarning huquq va majburiyatlari", hint: "Kim nima qiladi va nimadan voz kechadi.", required: true },
+  { key: "terms", title: "2. Bajarish shartlari va muddatlari", hint: "Summa, jadval, sanalar, toʻlov usuli.", required: true },
+  { key: "consequences", title: "3. Bajarilmaslik oqibatlari", hint: "Ixtiyoriy: tomonlar kelishsa belgilanadi.", required: false },
+] as const;
+type FieldKey = (typeof FIELDS)[number]["key"];
+const EMPTY: Record<FieldKey, string> = { rights: "", terms: "", consequences: "" };
+const LAW = "https://lex.uz/docs/-3805227";
 type Tab = "ish" | "chat" | "uchrashuv";
 
 function Workspace({ id }: { id: string }) {
@@ -43,16 +53,14 @@ function Workspace({ id }: { id: string }) {
   const [stage, setStage] = useState<Stage>("idle");
   const [ready, setReady] = useState(false);
   const [pendingBrief, setPendingBrief] = useState<Brief | null>(null);
-  const [terms, setTerms] = useState<string[] | null>(null);
-  const [newTerm, setNewTerm] = useState("");
-  const [draft, setDraft] = useState<Agreement | null>(null);
+  const [form, setForm] = useState<Record<FieldKey, string>>(EMPTY);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("ish");
   const { data: room, mutate: refreshRoom } = useRoom(c?.mediator ? { kind: "case", id } : null);
 
   if (!c) return <div className="h-64 animate-pulse rounded-2xl bg-muted" />;
   const brief = c.brief ?? pendingBrief;
-  const activeTerms = terms ?? (brief ? [brief.zopa, ...brief.suggested_options.slice(0, 1)] : []);
+  const formReady = FIELDS.every((f) => !f.required || form[f.key].trim().length >= 10);
 
   async function makeBrief() {
     if (!c) return;
@@ -77,36 +85,35 @@ function Workspace({ id }: { id: string }) {
     }
   }
 
-  async function makeDraft() {
-    if (!c || !brief) return;
-    setStage("drafting");
-    setReady(false);
-    try {
-      const a = await api<Agreement>("/ai/agreement/", {
-        body: {
-          code: c.code,
-          summary: c.description,
-          claimant_name: c.claimant.name,
-          respondent_name: c.respondent.name,
-          dispute_type: c.dispute_type,
-          amount_uzs: c.amount_uzs,
-          brief,
-          terms: activeTerms,
-        },
-      });
-      setDraft(a);
-      setReady(true);
-    } catch (e) {
-      toast.error(errorText(e));
-      setStage("idle");
+  /** Re-open a sent draft: clauses with our titles go back to their field, anything else lands in the first one. */
+  function startEdit() {
+    if (!c?.agreement) return;
+    const next: Record<FieldKey, string> = { ...EMPTY };
+    const other: string[] = [];
+    for (const cl of c.agreement.clauses) {
+      const f = FIELDS.find((x) => x.title === cl.title);
+      if (f) next[f.key] = cl.body;
+      else other.push(`${cl.title}: ${cl.body}`);
     }
+    if (other.length) next.rights = [...other, next.rights].filter(Boolean).join("\n\n");
+    setForm(next);
+    setStage("editing");
   }
 
   async function sendForApproval() {
-    if (!c || !draft) return;
+    if (!c || !formReady) return;
+    const agreement: Agreement = {
+      title: `Mediativ kelishuv № ${c.code}`,
+      clauses: FIELDS.filter((f) => form[f.key].trim()).map((f) => ({ title: f.title, body: form[f.key].trim() })),
+      citations: [
+        { article: "29-modda", title: "Mediativ kelishuv", url: LAW },
+        { article: "29¹-modda", title: "Mediativ kelishuvni ijro etish", url: LAW },
+      ],
+      source: "mediator",
+    };
     setBusy(true);
     try {
-      const u = await api<Case>(`/cases/${c.id}/`, { method: "PATCH", body: { agreement: draft } });
+      const u = await api<Case>(`/cases/${c.id}/`, { method: "PATCH", body: { agreement } });
       await mutate(u, { revalidate: false });
       setStage("idle");
       void refreshRoom();
@@ -183,133 +190,45 @@ function Workspace({ id }: { id: string }) {
 
       <div className={cn("mt-8 grid gap-6 lg:grid-cols-[1.5fr_1fr]", room && tab !== "ish" && "hidden")}>
         <div className="space-y-6">
-          {/* 1. Brief */}
-          {stage === "briefing" ? (
-            <AiThinking
-              title="AI maʼlumotnoma tayyorlamoqda"
-              steps={["Tomonlar pozitsiyasi oʻqilmoqda", "Faktlar ajratilmoqda", "Umumiy nuqtalar qidirilmoqda", "Kelishuv oraligʻi hisoblanmoqda"]}
-              done={ready}
-              minMs={2200}
-              onShown={() => setStage("idle")}
-            />
-          ) : brief ? (
-            <BriefCard brief={brief} />
-          ) : (
-            <section className="sheet flex flex-col items-start gap-3 p-6">
-              <span className="grid size-11 place-items-center rounded-xl bg-accord-tint text-accord">
-                <Sparkles className="size-5" />
-              </span>
-              <h2 className="text-xl font-semibold text-ink">Sessiyaga tayyorgarlik</h2>
-              <p className="text-ink-soft">AI ikkala tomon pozitsiyasidan 1 sahifalik maʼlumotnoma tuzadi: faktlar, umumiy nuqtalar va kelishuv oraligʻi.</p>
-              <Button variant="accord" size="lg" onClick={makeBrief}>
-                <Sparkles className="size-4" /> AI maʼlumotnoma
-              </Button>
-            </section>
-          )}
-
-          {/* 2. Agreement */}
-          {brief && !agreed && stage !== "sealing" && stage !== "briefing" && (!draftSent || stage === "editing" || stage === "drafting") && (
+          {/* 1. The agreement, written by the mediator (open from the start, nothing to unlock) */}
+          {c.status === "scheduled" && stage !== "sealing" && (!draftSent || stage === "editing") && (
             <section className="sheet p-5 sm:p-6">
               <div className="flex items-center gap-2.5">
                 <FileSignature className="size-5 text-accord" />
-                <h2 className="text-xl font-semibold text-ink">Kelishuv loyihasi</h2>
+                <h2 className="text-xl font-semibold text-ink">Mediativ kelishuv</h2>
               </div>
-              {stage === "drafting" ? (
-                <AiThinking
-                  className="mt-4 shadow-none"
-                  title="AI kelishuv yozmoqda"
-                  steps={["Shartlar tartiblanmoqda", "Qonun talablari tekshirilmoqda", "Bandlar yozilmoqda"]}
-                  done={ready}
-                  minMs={2000}
-                  onShown={() => setStage("editing")}
-                />
-              ) : draft && stage === "editing" ? (
-                <div className="mt-4 space-y-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <input
-                      value={draft.title}
-                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                      className="w-full bg-transparent font-doc text-lg font-semibold text-ink outline-none"
-                      aria-label="Kelishuv nomi"
+              <p className="mt-1 text-sm text-ink-soft">
+                Taraflar: {c.claimant.name} va {c.respondent.name || "ikkinchi tomon"}. Toʻliq F.I.Sh. va manzillarini ular tasdiqlashda oʻzlari kiritadi (29-modda).
+              </p>
+              <div className="mt-5 space-y-4">
+                {FIELDS.map((f) => (
+                  <label key={f.key} className="block">
+                    <span className="font-doc font-semibold text-ink">{f.title}</span>
+                    <span className="mt-0.5 block text-xs text-ink-soft">{f.hint}</span>
+                    <textarea
+                      value={form[f.key]}
+                      onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                      rows={4}
+                      className="mt-1.5 w-full resize-y rounded-xl border border-rule bg-paper/60 p-3 font-doc text-[1.02rem] leading-relaxed text-ink outline-none focus:border-accord"
                     />
-                    <AiSourceChip source={draft.source} />
-                  </div>
-                  {draft.clauses.map((cl, i) => (
-                    <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
-                      <p className="font-doc font-semibold text-ink">{cl.title}</p>
-                      <textarea
-                        value={cl.body}
-                        rows={Math.max(2, Math.ceil(cl.body.length / 80))}
-                        onChange={(e) =>
-                          setDraft({ ...draft, clauses: draft.clauses.map((x, j) => (j === i ? { ...x, body: e.target.value } : x)) })
-                        }
-                        className="mt-1 w-full resize-y rounded-xl border border-rule bg-paper/60 p-3 font-doc text-[1.02rem] leading-relaxed text-ink outline-none focus:border-accord"
-                      />
-                    </motion.div>
-                  ))}
-                  <div className="flex flex-wrap justify-between gap-3 pt-2">
-                    <Button variant="ghost" onClick={() => setStage("idle")}>
-                      Shartlarni oʻzgartirish
-                    </Button>
-                    <Button size="lg" variant="accord" disabled={busy} onClick={sendForApproval}>
-                      <Send className="size-5" /> {busy ? "Yuborilmoqda…" : "Tomonlarga tasdiqlashga yuborish"}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-4">
-                  <p className="text-ink-soft">Sessiyada kelishilgan shartlarni belgilang. AI ulardan qonunga mos kelishuv loyihasini tuzadi.</p>
-                  <div className="mt-4 space-y-2">
-                    {activeTerms.map((t, i) => (
-                      <div key={`${t}-${i}`} className="flex items-start gap-2 rounded-xl border border-accord/30 bg-accord-tint px-3 py-2.5">
-                        <Check className="mt-0.5 size-4 shrink-0 text-accord" />
-                        <p className="flex-1 text-[0.95rem] text-ink">{t}</p>
-                        <button type="button" aria-label="Olib tashlash" onClick={() => setTerms(activeTerms.filter((_, j) => j !== i))}>
-                          <X className="size-4 text-ink-soft hover:text-ink" />
-                        </button>
-                      </div>
-                    ))}
-                    {brief.suggested_options
-                      .filter((o) => !activeTerms.includes(o))
-                      .map((o) => (
-                        <button
-                          key={o}
-                          type="button"
-                          onClick={() => setTerms([...activeTerms, o])}
-                          className="flex w-full items-center gap-2 rounded-xl border border-dashed border-rule px-3 py-2.5 text-left text-[0.95rem] text-ink-soft hover:border-accord/40 hover:text-ink"
-                        >
-                          <Plus className="size-4" /> {o}
-                        </button>
-                      ))}
-                    <form
-                      className="flex gap-2"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (newTerm.trim()) setTerms([...activeTerms, newTerm.trim()]);
-                        setNewTerm("");
-                      }}
-                    >
-                      <input
-                        value={newTerm}
-                        onChange={(e) => setNewTerm(e.target.value)}
-                        placeholder="Oʻz shartingizni yozing…"
-                        className="h-11 flex-1 rounded-xl border border-input bg-white px-3 text-ink outline-none focus:border-accord"
-                      />
-                      <Button type="submit" variant="outline">
-                        Qoʻshish
-                      </Button>
-                    </form>
-                  </div>
-                  <Button size="lg" variant="accord" className="mt-5" disabled={activeTerms.length === 0} onClick={makeDraft}>
-                    <Sparkles className="size-4" /> Kelishuv loyihasini tuzish
+                  </label>
+                ))}
+              </div>
+              <div className="mt-5 flex flex-wrap justify-end gap-3">
+                {stage === "editing" && (
+                  <Button variant="ghost" onClick={() => setStage("idle")}>
+                    Bekor qilish
                   </Button>
-                </div>
-              )}
+                )}
+                <Button size="lg" variant="accord" disabled={busy || !formReady} onClick={sendForApproval}>
+                  <Send className="size-5" /> {busy ? "Yuborilmoqda…" : "Tomonlarga tasdiqlashga yuborish"}
+                </Button>
+              </div>
             </section>
           )}
 
           {/* 2b. Waiting for both parties */}
-          {draftSent && stage !== "editing" && stage !== "drafting" && stage !== "sealing" && c.agreement && (
+          {draftSent && stage !== "editing" && stage !== "sealing" && c.agreement && (
             <section className="sheet p-5 sm:p-6">
               <div className="flex items-center gap-2.5">
                 <FileSignature className="size-5 text-accord" />
@@ -330,10 +249,7 @@ function Workspace({ id }: { id: string }) {
               <div className="mt-5 flex flex-wrap justify-between gap-3">
                 <Button
                   variant="ghost"
-                  onClick={() => {
-                    setDraft(c.agreement);
-                    setStage("editing");
-                  }}
+                  onClick={startEdit}
                 >
                   <PenLine className="size-4" /> Loyihani tahrirlash
                 </Button>
@@ -370,6 +286,28 @@ function Workspace({ id }: { id: string }) {
               {c.claimant_position && <PositionCard title="Murojaatchi" name={c.claimant.name} data={c.claimant_position} tone="ink" />}
               {c.respondent_position && <PositionCard title="Ikkinchi tomon" name={c.respondent.name} data={c.respondent_position} tone="accord" />}
             </div>
+          )}
+          {/* Optional helper: never blocks the mediator's work */}
+          {stage === "briefing" ? (
+            <AiThinking
+              title="AI maʼlumotnoma tayyorlamoqda"
+              steps={["Tomonlar pozitsiyasi oʻqilmoqda", "Faktlar ajratilmoqda", "Umumiy nuqtalar qidirilmoqda"]}
+              done={ready}
+              minMs={2200}
+              onShown={() => setStage("idle")}
+            />
+          ) : brief ? (
+            <BriefCard brief={brief} />
+          ) : (
+            !agreed &&
+            c.status === "scheduled" && (
+              <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-dashed border-rule p-4">
+                <p className="text-sm text-ink-soft">Ixtiyoriy: AI tomonlar pozitsiyasidan qisqa maʼlumotnoma tuzib beradi.</p>
+                <Button variant="outline" size="sm" onClick={makeBrief}>
+                  <Sparkles className="size-4" /> AI maʼlumotnoma
+                </Button>
+              </section>
+            )
           )}
           {c.procedure && <ProcedureDoc p={c.procedure} />}
         </div>
