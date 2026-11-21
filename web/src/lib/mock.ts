@@ -5,11 +5,11 @@
 import agreementFx from "@/fixtures/agreement.json";
 import aiInviteFx from "@/fixtures/ai-invite.json";
 import askFx from "@/fixtures/ask.json";
+import demoMediators from "./demo-mediators.json";
 import briefFx from "@/fixtures/brief.json";
 import casesFx from "@/fixtures/cases.json";
 import classifyFx from "@/fixtures/classify.json";
 import compareFx from "@/fixtures/compare.json";
-import mediatorsFx from "@/fixtures/mediators.json";
 import statsFx from "@/fixtures/stats.json";
 import type {
   Agreement,
@@ -55,7 +55,8 @@ const DEMO_USERS: Record<string, { password: string; user: User }> = {
 
 const STORE_KEY = "ma.mock.cases.v4"; // v4: procedure agreement, term, termination, signatories
 const USERS_KEY = "ma.mock.users.v1";
-const mediators = mediatorsFx as Mediator[];
+// All 42 registry mediators the live demo seeds (snapshot of GET /api/mediators/), so mock mode can page through them too.
+const mediators = demoMediators as Mediator[];
 
 function load(): Case[] {
   try {
